@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Mohana · Rediseño de Podcasts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#7B2E88; --secondary:#E18F53; --tertiary:#5C1F6A;
+    --primary50:#F5EAF6; --primary100:#E8D0EB;
+    --secondary100:#F8DCC7;
+    --surface:#FFFFFF; --onSurface:#1A1B21; --onVariant:#49454F; --outline:#CDCDD5;
+    --brand: linear-gradient(135deg,#7B2E88,#5C1F6A);
+    --btn: linear-gradient(90deg,#A855B8,#7B2E88);
+    --tonal: linear-gradient(to bottom,#E3C2EA,#F0CBA8);
+    --shadow: 0 6px 18px rgba(92,31,106,.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Poppins',sans-serif;background:#15131a;color:#fff;padding:40px 24px 80px}
+  h1{font-family:'Bree Serif',serif;font-size:30px;font-style:italic;margin-bottom:6px;
+     background:linear-gradient(90deg,#C07DC0,#E18F53);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:#b3aebb;font-size:14px;margin-bottom:36px;max-width:860px;line-height:1.6}
+  .row{display:flex;gap:40px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+  .phone{width:320px;flex:0 0 auto}
+  .label{margin-bottom:14px;text-align:center}
+  .label .tag{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;background:#7B2E88;padding:4px 12px;border-radius:6px;display:inline-block}
+  .label h2{font-size:17px;font-weight:700;margin:10px 0 4px;color:#fff}
+  .label p{font-size:12px;color:#9b95a5;line-height:1.5}
+  .screen{border-radius:36px;overflow:hidden;border:9px solid #2a2733;box-shadow:0 24px 60px rgba(0,0,0,.5);height:680px;position:relative;background:var(--tonal)}
+  .scroll{height:100%;overflow:hidden}
+
+  /* top bar */
+  .top{display:flex;align-items:center;gap:12px;padding:16px}
+  .top .ic{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--primary)}
+  .top h3{font-family:'Bree Serif',serif;font-size:20px;color:var(--tertiary);flex:1}
+
+  .sec{display:flex;align-items:center;justify-content:space-between;padding:6px 16px 10px}
+  .sec .t{display:flex;align-items:center;gap:8px}
+  .sec .bar{width:4px;height:15px;border-radius:3px;background:var(--btn)}
+  .sec span{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--primary)}
+  .sec .all{font-size:11px;font-weight:700;color:var(--tertiary)}
+
+  /* HERO destacado */
+  .hero{margin:0 16px 4px;background:#fff;border-radius:20px;box-shadow:var(--shadow);padding:14px;display:flex;gap:14px;align-items:center}
+  .hero .art{width:96px;height:96px;border-radius:16px;flex:0 0 auto;background:linear-gradient(135deg,#7B2E88,#E18F53)}
+  .hero .meta small{font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--secondary);text-transform:uppercase}
+  .hero .meta h4{font-family:'Bree Serif',serif;font-size:17px;color:var(--onSurface);line-height:1.2;margin:4px 0 6px}
+  .hero .meta .pill{display:inline-flex;align-items:center;gap:6px;background:var(--btn);color:#fff;font-size:12px;font-weight:700;padding:7px 14px;border-radius:100px}
+
+  /* carrusel mediano */
+  .carousel{display:flex;gap:14px;overflow:hidden;padding:4px 16px 8px}
+  .cap{width:130px;flex:0 0 auto}
+  .cap .art{width:130px;height:130px;border-radius:18px;box-shadow:var(--shadow)}
+  .cap h5{font-family:'Poppins';font-size:12px;font-weight:700;margin:8px 0 2px;color:var(--onSurface);line-height:1.2}
+  .cap small{font-size:10px;color:var(--onVariant)}
+
+  /* grid 2 col */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:6px 16px 24px}
+  .gitem{background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:10px;display:flex;flex-direction:column;gap:8px}
+  .gitem .art{width:100%;aspect-ratio:1;border-radius:12px}
+  .gitem h6{font-size:12px;font-weight:700;color:var(--onSurface);line-height:1.2}
+  .gitem small{font-size:10px;color:var(--onVariant)}
+
+  /* DETAIL */
+  .d-cover{display:flex;flex-direction:column;align-items:center;padding:8px 24px 0}
+  .d-cover .art{width:180px;height:180px;border-radius:24px;box-shadow:0 14px 36px rgba(92,31,106,.32);background:linear-gradient(135deg,#7B2E88,#E18F53)}
+  .d-cover h2{font-family:'Bree Serif',serif;font-size:21px;color:var(--tertiary);text-align:center;margin:16px 0 4px;line-height:1.2}
+  .d-cover .freq{font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--secondary);text-transform:uppercase}
+  .d-desc{font-size:12px;color:var(--onVariant);text-align:center;line-height:1.5;margin:12px 0 2px}
+  .d-more{font-size:12px;font-weight:700;color:var(--primary);text-align:center;display:block;margin-bottom:6px}
+  .d-play{display:flex;justify-content:center;gap:10px;margin:14px 0 10px}
+  .d-play .main{background:var(--btn);color:#fff;font-size:13px;font-weight:700;padding:11px 26px;border-radius:100px;display:inline-flex;align-items:center;gap:8px;box-shadow:0 6px 16px rgba(123,46,136,.35)}
+  .d-play .alt{width:44px;height:44px;border-radius:100px;background:#fff;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:18px}
+  .d-list-h{display:flex;align-items:center;gap:8px;padding:8px 18px 6px}
+  .d-list-h .bar{width:4px;height:14px;border-radius:3px;background:var(--btn)}
+  .d-list-h span{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--primary)}
+  .ep{display:flex;align-items:center;gap:12px;padding:11px 18px;margin:0 8px;border-radius:14px}
+  .ep.active{background:#fff;box-shadow:var(--shadow)}
+  .ep .pb{width:40px;height:40px;border-radius:100px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:16px;background:#fff;color:var(--primary);box-shadow:0 2px 8px rgba(92,31,106,.18)}
+  .ep.active .pb{background:var(--btn);color:#fff;box-shadow:none}
+  .ep .info{flex:1;min-width:0}
+  .ep .info h6{font-size:13px;font-weight:600;color:var(--onSurface);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ep.active .info h6{color:var(--primary)}
+  .ep .info small{font-size:10px;color:var(--onVariant)}
+  .ep .dur{font-size:10px;color:var(--onVariant);flex:0 0 auto}
+
+  /* mini player */
+  .mini{position:absolute;left:0;right:0;bottom:0;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-top:1px solid rgba(205,205,213,.4);display:flex;align-items:center;gap:12px;padding:10px 16px}
+  .mini .a{width:40px;height:40px;border-radius:10px;background:var(--brand)}
+  .mini .x{flex:1;min-width:0}
+  .mini .x b{font-size:13px;font-weight:700;color:var(--onSurface);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mini .x small{font-size:11px;color:var(--onVariant)}
+  .mini .p{width:40px;height:40px;border-radius:100px;background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px}
+
+  .g1{background:linear-gradient(135deg,#7B2E88,#5C1F6A)}
+  .g2{background:linear-gradient(135deg,#9D47A4,#E18F53)}
+  .g3{background:linear-gradient(135deg,#E18F53,#C76828)}
+  .g4{background:linear-gradient(135deg,#5C1F6A,#9D47A4)}
+  .g5{background:linear-gradient(135deg,#7B2E88,#D47A3D)}
+  .g6{background:linear-gradient(135deg,#4A155C,#7B2E88)}
+</style>
+</head>
+<body>
+  <h1>La Mohana — Rediseño de Podcasts</h1>
+  <p class="sub">Flujo propuesto: <b>Home → "Ver todos" → Biblioteca de Podcasts → Programa</b>. La biblioteca muestra los programas en distintas formas y tamaños (estilo Spotify / YouTube Premium). El detalle del programa mantiene el estilo tonal: carátula central, nombre, descripción con "ver más" y la lista de episodios para ir cambiando. El mini-player se mantiene fijo abajo en todo momento.</p>
+
+  <div class="row">
+
+    <!-- ════ PANTALLA 1: BIBLIOTECA ════ -->
+    <div class="phone">
+      <div class="label">
+        <span class="tag">Pantalla 1</span>
+        <h2>Biblioteca de Podcasts</h2>
+        <p>Se llega con "Ver todos" desde el Home.</p>
+      </div>
+      <div class="screen">
+        <div class="scroll">
+          <div class="top"><div class="ic">‹</div><h3>Podcasts</h3><div class="ic">⌕</div></div>
+
+          <!-- Hero destacado -->
+          <div class="sec"><div class="t"><div class="bar"></div><span>Destacado</span></div></div>
+          <div class="hero">
+            <div class="art g1"></div>
+            <div class="meta">
+              <small>Lo más escuchado</small>
+              <h4>Revista Informativa La Mohana</h4>
+              <span class="pill">▶ Reproducir</span>
+            </div>
+          </div>
+
+          <!-- Carrusel recientes -->
+          <div class="sec"><div class="t"><div class="bar"></div><span>Episodios recientes</span></div><div class="all">Ver todos</div></div>
+          <div class="carousel">
+            <div class="cap"><div class="art g2"></div><h5>Comuna Popular</h5><small>Hoy</small></div>
+            <div class="cap"><div class="art g3"></div><h5>Guardianas Ambientales</h5><small>Ayer</small></div>
+            <div class="cap"><div class="art g4"></div><h5>Mujeres y melodías</h5><small>2 días</small></div>
+          </div>
+
+          <!-- Grid todos -->
+          <div class="sec"><div class="t"><div class="bar"></div><span>Todos los programas</span></div></div>
+          <div class="grid">
+            <div class="gitem"><div class="art g5"></div><h6>Memorias con sentido</h6><small>14 episodios</small></div>
+            <div class="gitem"><div class="art g6"></div><h6>Mujeres emprendedoras</h6><small>9 episodios</small></div>
+            <div class="gitem"><div class="art g2"></div><h6>Alma de campeonas</h6><small>7 episodios</small></div>
+            <div class="gitem"><div class="art g1"></div><h6>Dignidad y Región</h6><small>11 episodios</small></div>
+          </div>
+        </div>
+        <div class="mini"><div class="a"></div><div class="x"><b>Comuna Popular · Ep. 12</b><small>Reproduciendo</small></div><div class="p">⏸</div></div>
+      </div>
+    </div>
+
+    <!-- ════ PANTALLA 2: DETALLE PROGRAMA ════ -->
+    <div class="phone">
+      <div class="label">
+        <span class="tag" style="background:#E18F53">Pantalla 2</span>
+        <h2>Programa / Episodios</h2>
+        <p>Se llega al tocar un programa.</p>
+      </div>
+      <div class="screen">
+        <div class="scroll">
+          <div class="top"><div class="ic">‹</div><h3 style="font-size:16px">Programa</h3><div class="ic">⤴</div></div>
+
+          <div class="d-cover">
+            <div class="art"></div>
+            <h2>Comuna Popular</h2>
+            <div class="freq">La Mohana · 91.2 FM</div>
+            <p class="d-desc">Un espacio de las mujeres de la OFP para contar las luchas, victorias y la vida cotidiana del Magdalena Medio…</p>
+            <span class="d-more">Ver más ▾</span>
+            <div class="d-play">
+              <span class="main">▶ Reproducir</span>
+              <span class="alt">↻</span>
+            </div>
+          </div>
+
+          <div class="d-list-h"><div class="bar"></div><span>Episodios</span></div>
+
+          <div class="ep active">
+            <div class="pb">⏸</div>
+            <div class="info"><h6>El río que nos une — edición especial</h6><small>29 may 2026</small></div>
+            <div class="dur">48 min</div>
+          </div>
+          <div class="ep">
+            <div class="pb">▶</div>
+            <div class="info"><h6>Mujeres tejedoras de memoria</h6><small>22 may 2026</small></div>
+            <div class="dur">52 min</div>
+          </div>
+          <div class="ep">
+            <div class="pb">▶</div>
+            <div class="info"><h6>Jornada de bienestar comunitario</h6><small>15 may 2026</small></div>
+            <div class="dur">45 min</div>
+          </div>
+          <div class="ep">
+            <div class="pb">▶</div>
+            <div class="info"><h6>Voces del campo: la siembra</h6><small>8 may 2026</small></div>
+            <div class="dur">50 min</div>
+          </div>
+          <div style="height:80px"></div>
+        </div>
+        <div class="mini"><div class="a"></div><div class="x"><b>El río que nos une</b><small>Comuna Popular</small></div><div class="p">⏸</div></div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

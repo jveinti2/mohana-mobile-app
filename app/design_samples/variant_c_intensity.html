@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Mohana · Variante C — intensidad de fondo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#7B2E88; --secondary:#E18F53; --tertiary:#5C1F6A;
+    --primary50:#F5EAF6; --primary100:#E8D0EB; --primary200:#D4A3D6;
+    --secondary50:#FDF3EB; --secondary100:#F8DCC7;
+    --surface:#FFFFFF; --onSurface:#1A1B21; --onVariant:#49454F; --outline:#CDCDD5;
+    --brand: linear-gradient(135deg,#7B2E88,#5C1F6A);
+    --btn: linear-gradient(90deg,#A855B8,#7B2E88);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Poppins',sans-serif;background:#15131a;color:#fff;padding:40px 24px 80px}
+  h1{font-family:'Bree Serif',serif;font-size:30px;font-style:italic;margin-bottom:6px;
+     background:linear-gradient(90deg,#C07DC0,#E18F53);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:#b3aebb;font-size:14px;margin-bottom:36px;max-width:820px;line-height:1.6}
+  .row{display:flex;gap:34px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+  .phone{width:300px;flex:0 0 auto}
+  .label{margin-bottom:14px}
+  .label .tag{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;background:#5C1F6A;padding:4px 10px;border-radius:6px;display:inline-block}
+  .label h2{font-size:16px;font-weight:700;margin:8px 0 4px;color:#fff}
+  .label p{font-size:12px;color:#9b95a5;line-height:1.5}
+  .label code{font-size:11px;color:#d7b8e0;background:#2a2435;padding:1px 6px;border-radius:4px}
+  .screen{border-radius:34px;overflow:hidden;border:8px solid #2a2733;box-shadow:0 24px 60px rgba(0,0,0,.5);height:620px;position:relative}
+  .scroll{height:100%;overflow:hidden}
+  .appbar{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 12px}
+  .appbar .brand{font-family:'Bree Serif',serif;font-style:italic;font-weight:700;font-size:19px;color:var(--primary)}
+  .ofp{width:30px;height:30px;border-radius:8px;background:#fff;border:1px solid #eee;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--primary)}
+  .eyebrow{display:flex;align-items:center;gap:8px;padding:0 16px;margin:6px 0 12px}
+  .eyebrow .bar{width:4px;height:15px;border-radius:3px;background:var(--btn)}
+  .eyebrow span{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--primary)}
+  .featured{margin:0 16px;height:170px;border-radius:16px;overflow:hidden;position:relative}
+  .featured .ph{position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,rgba(225,143,83,.45),transparent 60%),linear-gradient(135deg,#9D47A4,#5C1F6A)}
+  .featured .ov{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,.78))}
+  .featured .ct{position:absolute;left:0;right:0;bottom:0;padding:14px}
+  .chip{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.6px;color:#fff;padding:3px 8px;border-radius:6px;background:#00897B}
+  .featured h3{font-family:'Bree Serif',serif;color:#fff;font-size:17px;line-height:1.2;margin:7px 0 3px}
+  .featured small{color:rgba(255,255,255,.85);font-size:11px}
+  .list{padding:0 16px;margin-top:18px;display:flex;flex-direction:column;gap:14px}
+  .card{display:flex;gap:12px;padding:12px;border-radius:16px}
+  .thumb{width:74px;height:74px;border-radius:12px;flex:0 0 auto}
+  .card .cat{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+  .card h4{font-family:'Bree Serif',serif;font-size:14px;color:var(--onSurface);line-height:1.25;margin:3px 0}
+  .card p{font-size:11px;color:var(--onVariant);line-height:1.35}
+  .more{font-size:11px;font-weight:700;color:var(--primary);margin-top:5px}
+  .pods{margin-top:20px;padding-left:16px;display:flex;gap:12px;overflow:hidden}
+  .pod{width:120px;flex:0 0 auto}
+  .pod .art{width:120px;height:120px;border-radius:16px;background:linear-gradient(135deg,#7B2E88,#E18F53)}
+  .pod h5{font-family:'Montserrat';font-size:12px;font-weight:600;margin:8px 0 2px;color:var(--onSurface)}
+  .pod small{font-size:10px;color:var(--onVariant)}
+</style>
+</head>
+<body>
+  <h1>Variante C — ¿qué tan pronunciado el fondo?</h1>
+  <p class="sub">La misma Home tonal, con 3 intensidades de tinte de fondo. Las cards se mantienen en pasteles de marca (lila / durazno). Decime el número que te guste y lo aplico a Flutter. También puedo subir/bajar a gusto un punto intermedio.</p>
+
+  <div class="row">
+
+    <!-- C1 — actual (suave) -->
+    <div class="phone">
+      <div class="label">
+        <span class="tag">C1 · Suave</span>
+        <h2>Como estaba</h2>
+        <p>Lila muy tenue. <code>#F5EAF6 → #FDF3EB</code></p>
+      </div>
+      <div class="screen" style="background:linear-gradient(to bottom,#F5EAF6,#FDF3EB)">
+        <div class="scroll">
+          <div class="appbar"><div class="brand">La Mohana</div><div class="ofp">OFP</div></div>
+          <div class="eyebrow"><div class="bar"></div><span>Destacado</span></div>
+          <div class="featured"><div class="ph"></div><div class="ov"></div><div class="ct"><span class="chip">IMPACTO SOCIAL</span><h3>Mujeres del Magdalena lideran la siembra</h3><small>Leer más →</small></div></div>
+          <div class="eyebrow" style="margin-top:18px"><div class="bar"></div><span>Lo más reciente</span></div>
+          <div class="list">
+            <div class="card" style="background:#F5EAF6"><div class="thumb" style="background:#E8D0EB"></div><div><div class="cat" style="color:var(--primary)">CULTURA</div><h4>Tejedoras de memoria en Barranca</h4><p>El arte que sana.</p><div class="more">LEER MÁS →</div></div></div>
+            <div class="card" style="background:#FDF3EB"><div class="thumb" style="background:#F8DCC7"></div><div><div class="cat" style="color:#C76828">SALUD</div><h4>Jornada de bienestar comunitario</h4><p>200 familias.</p><div class="more" style="color:#C76828">LEER MÁS →</div></div></div>
+          </div>
+          <div class="pods"><div class="pod"><div class="art"></div><h5>Comuna Popular</h5><small>12 episodios</small></div><div class="pod"><div class="art" style="background:linear-gradient(135deg,#9D47A4,#E18F53)"></div><h5>Guardianas</h5><small>8 episodios</small></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- C2 — medio (recomendado) -->
+    <div class="phone">
+      <div class="label">
+        <span class="tag" style="background:#7B2E88">C2 · Medio ★</span>
+        <h2>Recomendado</h2>
+        <p>Lila claramente perceptible, cards en blanco para contraste. <code>#EFD9F2 → #F8DCC7</code></p>
+      </div>
+      <div class="screen" style="background:linear-gradient(to bottom,#EFD9F2,#F6E3D2)">
+        <div class="scroll">
+          <div class="appbar"><div class="brand">La Mohana</div><div class="ofp">OFP</div></div>
+          <div class="eyebrow"><div class="bar"></div><span>Destacado</span></div>
+          <div class="featured"><div class="ph"></div><div class="ov"></div><div class="ct"><span class="chip">IMPACTO SOCIAL</span><h3>Mujeres del Magdalena lideran la siembra</h3><small>Leer más →</small></div></div>
+          <div class="eyebrow" style="margin-top:18px"><div class="bar"></div><span>Lo más reciente</span></div>
+          <div class="list">
+            <div class="card" style="background:#fff;box-shadow:0 4px 14px rgba(123,46,136,.10)"><div class="thumb" style="background:#E8D0EB"></div><div><div class="cat" style="color:var(--primary)">CULTURA</div><h4>Tejedoras de memoria en Barranca</h4><p>El arte que sana.</p><div class="more">LEER MÁS →</div></div></div>
+            <div class="card" style="background:#fff;box-shadow:0 4px 14px rgba(123,46,136,.10)"><div class="thumb" style="background:#F8DCC7"></div><div><div class="cat" style="color:#C76828">SALUD</div><h4>Jornada de bienestar comunitario</h4><p>200 familias.</p><div class="more" style="color:#C76828">LEER MÁS →</div></div></div>
+          </div>
+          <div class="pods"><div class="pod"><div class="art"></div><h5>Comuna Popular</h5><small>12 episodios</small></div><div class="pod"><div class="art" style="background:linear-gradient(135deg,#9D47A4,#E18F53)"></div><h5>Guardianas</h5><small>8 episodios</small></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- C3 — fuerte -->
+    <div class="phone">
+      <div class="label">
+        <span class="tag" style="background:#E18F53">C3 · Fuerte</span>
+        <h2>Bien marcado</h2>
+        <p>Lila intenso de marca. Cards blancas obligatorias para legibilidad. <code>#E3C2EA → #F2C5A3</code></p>
+      </div>
+      <div class="screen" style="background:linear-gradient(to bottom,#E3C2EA,#F0CBA8)">
+        <div class="scroll">
+          <div class="appbar"><div class="brand">La Mohana</div><div class="ofp">OFP</div></div>
+          <div class="eyebrow"><div class="bar"></div><span>Destacado</span></div>
+          <div class="featured"><div class="ph"></div><div class="ov"></div><div class="ct"><span class="chip">IMPACTO SOCIAL</span><h3>Mujeres del Magdalena lideran la siembra</h3><small>Leer más →</small></div></div>
+          <div class="eyebrow" style="margin-top:18px"><div class="bar"></div><span>Lo más reciente</span></div>
+          <div class="list">
+            <div class="card" style="background:#fff;box-shadow:0 6px 18px rgba(92,31,106,.16)"><div class="thumb" style="background:#E8D0EB"></div><div><div class="cat" style="color:var(--primary)">CULTURA</div><h4>Tejedoras de memoria en Barranca</h4><p>El arte que sana.</p><div class="more">LEER MÁS →</div></div></div>
+            <div class="card" style="background:#fff;box-shadow:0 6px 18px rgba(92,31,106,.16)"><div class="thumb" style="background:#F8DCC7"></div><div><div class="cat" style="color:#C76828">SALUD</div><h4>Jornada de bienestar comunitario</h4><p>200 familias.</p><div class="more" style="color:#C76828">LEER MÁS →</div></div></div>
+          </div>
+          <div class="pods"><div class="pod"><div class="art"></div><h5>Comuna Popular</h5><small>12 episodios</small></div><div class="pod"><div class="art" style="background:linear-gradient(135deg,#9D47A4,#E18F53)"></div><h5>Guardianas</h5><small>8 episodios</small></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

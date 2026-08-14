@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "frontend-design": {
+      "source": "blogic-cz/blogic-marketplace",
+      "sourceType": "github",
+      "skillPath": "template-ts/skills/frontend-design/SKILL.md",
+      "computedHash": "c643aa1020dc0049b8e1cfc25bd440cedb40100e5751d1c384b96b2096bab939"
+    }
+  }
+}
