@@ -122,27 +122,14 @@ class SectionEyebrow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: MohanaSpacing.screenH),
-      child: Row(
-        children: [
-          Container(
-            width: 22,
-            height: 3,
-            decoration: BoxDecoration(
-              gradient: MohanaGradients.primaryButton,
-              borderRadius: BorderRadius.circular(MohanaRadius.pill),
-            ),
-          ),
-          const SizedBox(width: MohanaSpacing.sm),
-          Text(
-            label.toUpperCase(),
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.6,
-              color: MohanaColors.primary600,
-            ),
-          ),
-        ],
+      child: Text(
+        label.toUpperCase(),
+        style: GoogleFonts.poppins(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.4,
+          color: MohanaColors.primary600,
+        ),
       ),
     );
   }

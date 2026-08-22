@@ -25,8 +25,10 @@ class MohanaAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: const EdgeInsets.only(right: MohanaSpacing.base),
           child: Center(
             child: Image.asset(
-              'assets/images/logo_ofp.jpeg',
+              'assets/images/logo_ofp.png',
               height: 30,
+              // Se pinta a 30 dp: evita decodificar el asset a tamaño completo.
+              cacheHeight: 96,
               fit: BoxFit.contain,
             ),
           ),

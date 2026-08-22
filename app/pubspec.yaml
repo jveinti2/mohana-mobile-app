@@ -39,6 +39,7 @@ dependencies:
   http: ^1.2.0
   share_plus: ^10.1.4
   xml: ^6.5.0
+  shared_preferences: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -64,7 +65,7 @@ flutter:
 
   assets:
     - assets/images/logo_emisora.png
-    - assets/images/logo_ofp.jpeg
+    - assets/images/logo_ofp.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -3,6 +3,7 @@ import '../config/drive_config.dart';
 import '../models/news_article.dart';
 import '../models/podcast_item.dart';
 import 'drive_service.dart';
+import 'task_pool.dart';
 
 /// Resultado del parseo de un archivo markdown con frontmatter.
 class _ParsedMarkdown {
@@ -13,16 +14,17 @@ class _ParsedMarkdown {
 }
 
 /// Contenido completo del home feed, cargado desde Google Drive.
+///
+/// Los podcasts no salen de aquí: la fuente es iVoox ([IvooxService]). Solo se
+/// conserva [podcastDestacado] como respaldo para cuando iVoox no responde.
 class HomeContent {
   final NewsArticle? titular;
   final List<NewsArticle> articulos;
-  final List<PodcastItem> podcasts;
   final PodcastItem? podcastDestacado;
 
   const HomeContent({
     this.titular,
     this.articulos = const [],
-    this.podcasts = const [],
     this.podcastDestacado,
   });
 }
@@ -31,14 +33,36 @@ class HomeContent {
 ///
 /// Lee la estructura de carpetas en Drive y la convierte en modelos de la app.
 class ContentService {
+  /// Peticiones simultáneas a Drive. Acorta la espera sin arriesgarse a que
+  /// Drive limite por ráfaga.
+  static const _driveConcurrency = 4;
+
+  /// Cuánto se reutiliza lo ya descargado. Evita que cambiar de pestaña o
+  /// volver atrás dispare otra vez todas las peticiones a Drive.
+  static const _cacheTtl = Duration(minutes: 5);
+
+  static HomeContent? _cached;
+  static DateTime? _cachedAt;
+
   /// Carga todo el contenido del home feed.
-  static Future<HomeContent> loadHomeContent() async {
+  static Future<HomeContent> loadHomeContent({bool forceRefresh = false}) async {
     if (!DriveConfig.isConfigured) {
       return const HomeContent();
     }
 
+    final cached = _cached;
+    final at = _cachedAt;
+    if (!forceRefresh &&
+        cached != null &&
+        at != null &&
+        DateTime.now().difference(at) < _cacheTtl) {
+      return cached;
+    }
+
     // Descubrir carpetas sección dentro de la raíz
-    final rootFolders = await DriveService.listFolders(DriveConfig.rootFolderId);
+    final rootFolders = await DriveService.listFolders(
+      DriveConfig.rootFolderId,
+    );
     final sectionMap = <String, String>{};
     for (final folder in rootFolders) {
       sectionMap[folder.name.toLowerCase()] = folder.id;
@@ -48,16 +72,17 @@ class ContentService {
     final results = await Future.wait([
       _loadTitular(sectionMap[DriveConfig.titularFolder]),
       _loadArticulos(sectionMap[DriveConfig.articulosFolder]),
-      _loadPodcasts(sectionMap[DriveConfig.podcastsFolder]),
       _loadPodcastDestacado(sectionMap[DriveConfig.podcastDestacadoFolder]),
     ]);
 
-    return HomeContent(
+    final content = HomeContent(
       titular: results[0] as NewsArticle?,
       articulos: results[1] as List<NewsArticle>,
-      podcasts: results[2] as List<PodcastItem>,
-      podcastDestacado: results[3] as PodcastItem?,
+      podcastDestacado: results[2] as PodcastItem?,
     );
+    _cached = content;
+    _cachedAt = DateTime.now();
+    return content;
   }
 
   /// Carga el artículo titular (carpeta con contenido.md + imagen).
@@ -71,12 +96,15 @@ class ContentService {
     if (folderId == null) return [];
 
     final subfolders = await DriveService.listFolders(folderId);
-    final articles = <NewsArticle>[];
 
-    for (final folder in subfolders) {
-      final article = await _loadSingleArticle(folder.id, folder.name);
-      if (article != null) articles.add(article);
-    }
+    // En paralelo (con tope): cada artículo son 2-3 peticiones a Drive, y en
+    // serie la espera era la suma de todas.
+    final loaded = await pooled<DriveFile, NewsArticle?>(
+      subfolders,
+      _driveConcurrency,
+      (folder) => _loadSingleArticle(folder.id, folder.name),
+    );
+    final articles = loaded.whereType<NewsArticle>().toList();
 
     // Ordenar por fecha (más reciente primero)
     articles.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
@@ -85,7 +113,9 @@ class ContentService {
 
   /// Carga un artículo desde una carpeta (contenido.md + imagen.*).
   static Future<NewsArticle?> _loadSingleArticle(
-      String folderId, String fallbackId) async {
+    String folderId,
+    String fallbackId,
+  ) async {
     final files = await DriveService.listFiles(folderId);
 
     // Buscar markdown y imagen
@@ -113,21 +143,6 @@ class ContentService {
     );
   }
 
-  /// Carga la lista de podcasts (subcarpetas dentro de podcasts/).
-  static Future<List<PodcastItem>> _loadPodcasts(String? folderId) async {
-    if (folderId == null) return [];
-
-    final subfolders = await DriveService.listFolders(folderId);
-    final podcasts = <PodcastItem>[];
-
-    for (final folder in subfolders) {
-      final podcast = await _loadSinglePodcast(folder.id, folder.name);
-      if (podcast != null) podcasts.add(podcast);
-    }
-
-    return podcasts;
-  }
-
   /// Carga el podcast destacado (carpeta con contenido.md + portada.*).
   static Future<PodcastItem?> _loadPodcastDestacado(String? folderId) async {
     if (folderId == null) return null;
@@ -136,7 +151,9 @@ class ContentService {
 
   /// Carga un podcast desde una carpeta (contenido.md + portada.*).
   static Future<PodcastItem?> _loadSinglePodcast(
-      String folderId, String fallbackId) async {
+    String folderId,
+    String fallbackId,
+  ) async {
     final files = await DriveService.listFiles(folderId);
 
     DriveFile? mdFile;

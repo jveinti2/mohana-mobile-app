@@ -36,7 +36,8 @@ class FeedSkeleton extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               physics: const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(
-                  horizontal: MohanaSpacing.screenH),
+                horizontal: MohanaSpacing.screenH,
+              ),
               children: const [
                 _Box(width: 140, height: 150, radius: MohanaRadius.lg),
                 SizedBox(width: MohanaSpacing.md),
@@ -46,6 +47,63 @@ class FeedSkeleton extends StatelessWidget {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Esqueleto de la fila horizontal de podcasts. Se usa cuando el feed ya se
+/// pintó pero el catálogo de iVoox todavía viene en camino: el resto de la
+/// pantalla no espera por él.
+class PodcastRowSkeleton extends StatelessWidget {
+  final double height;
+  final double cardWidth;
+  final int count;
+
+  const PodcastRowSkeleton({
+    super.key,
+    this.height = 150,
+    this.cardWidth = 140,
+    this.count = 3,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _Shimmer(
+      child: SizedBox(
+        height: height,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(
+            horizontal: MohanaSpacing.screenH,
+          ),
+          itemCount: count,
+          separatorBuilder: (_, _) => const SizedBox(width: MohanaSpacing.md),
+          itemBuilder: (_, _) =>
+              _Box(width: cardWidth, height: height, radius: MohanaRadius.lg),
+        ),
+      ),
+    );
+  }
+}
+
+/// Esqueleto de una lista de episodios (detalle de programa).
+class EpisodeListSkeleton extends StatelessWidget {
+  final int count;
+
+  const EpisodeListSkeleton({super.key, this.count = 5});
+
+  @override
+  Widget build(BuildContext context) {
+    return _Shimmer(
+      child: Column(
+        children: [
+          for (var i = 0; i < count; i++) ...[
+            const _SkeletonRow(),
+            const SizedBox(height: MohanaSpacing.base),
+          ],
         ],
       ),
     );

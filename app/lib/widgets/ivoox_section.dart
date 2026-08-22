@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/theme.dart';
+import 'mohana_cover.dart';
 import '../models/podcast_item.dart';
 
 class IvooxSection extends StatelessWidget {
@@ -23,10 +23,46 @@ class IvooxSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header
+        IvooxSectionHeader(onSeeAll: onSeeAll),
+        const SizedBox(height: MohanaSpacing.base),
+
+        // Horizontal scroll of podcast cards
+        SizedBox(
+          height: 150,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(
+              horizontal: MohanaSpacing.screenH,
+            ),
+            itemCount: podcasts.length,
+            separatorBuilder: (_, _) => const SizedBox(width: MohanaSpacing.md),
+            itemBuilder: (_, index) => _PodcastProgramCard(
+              podcast: podcasts[index],
+              onTap: () => onPodcastTap?.call(podcasts[index]),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Cabecera de la sección de podcasts. Separada del cuerpo para poder
+/// mostrarla junto al esqueleto mientras llega el catálogo.
+class IvooxSectionHeader extends StatelessWidget {
+  final VoidCallback? onSeeAll;
+
+  const IvooxSectionHeader({super.key, this.onSeeAll});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: MohanaSpacing.screenH),
+          padding: const EdgeInsets.symmetric(
+            horizontal: MohanaSpacing.screenH,
+          ),
           child: Row(
             children: [
               const Icon(Icons.podcasts, color: MohanaColors.primary, size: 22),
@@ -54,8 +90,11 @@ class IvooxSection extends StatelessWidget {
                           color: MohanaColors.tertiary,
                         ),
                       ),
-                      const Icon(Icons.chevron_right,
-                          color: MohanaColors.tertiary, size: 18),
+                      const Icon(
+                        Icons.chevron_right,
+                        color: MohanaColors.tertiary,
+                        size: 18,
+                      ),
                     ],
                   ),
                 ),
@@ -64,31 +103,14 @@ class IvooxSection extends StatelessWidget {
         ),
         const SizedBox(height: MohanaSpacing.xs),
         Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: MohanaSpacing.screenH),
+          padding: const EdgeInsets.symmetric(
+            horizontal: MohanaSpacing.screenH,
+          ),
           child: Text(
             'La emisora de las mujeres · 91.2 FM',
             style: GoogleFonts.poppins(
               fontSize: 12,
               color: MohanaColors.onSurfaceVariant,
-            ),
-          ),
-        ),
-        const SizedBox(height: MohanaSpacing.base),
-
-        // Horizontal scroll of podcast cards
-        SizedBox(
-          height: 150,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding:
-                const EdgeInsets.symmetric(horizontal: MohanaSpacing.screenH),
-            itemCount: podcasts.length,
-            separatorBuilder: (_, _) =>
-                const SizedBox(width: MohanaSpacing.md),
-            itemBuilder: (_, index) => _PodcastProgramCard(
-              podcast: podcasts[index],
-              onTap: () => onPodcastTap?.call(podcasts[index]),
             ),
           ),
         ),
@@ -119,18 +141,10 @@ class _PodcastProgramCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Cover image or icon
-            ClipRRect(
+            MohanaCover.square(
+              url: podcast.imageUrl,
+              size: 36,
               borderRadius: MohanaRadius.smAll,
-              child: podcast.imageUrl.isNotEmpty
-                  ? CachedNetworkImage(
-                      imageUrl: podcast.imageUrl,
-                      width: 36,
-                      height: 36,
-                      fit: BoxFit.cover,
-                      placeholder: (_, _) => _iconFallback(),
-                      errorWidget: (_, _, _) => _iconFallback(),
-                    )
-                  : _iconFallback(),
             ),
             const Spacer(),
             Text(
@@ -146,9 +160,7 @@ class _PodcastProgramCard extends StatelessWidget {
             ),
             const SizedBox(height: MohanaSpacing.xxs),
             Text(
-              podcast.episodes != null
-                  ? '${podcast.episodes} episodios'
-                  : podcast.description,
+              podcast.episodesLabel,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.poppins(
@@ -159,18 +171,6 @@ class _PodcastProgramCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _iconFallback() {
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        color: MohanaColors.primary.withValues(alpha: 0.12),
-        borderRadius: MohanaRadius.smAll,
-      ),
-      child: const Icon(Icons.podcasts, size: 20, color: MohanaColors.primary),
     );
   }
 }

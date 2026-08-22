@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/theme.dart';
+import 'mohana_cover.dart';
 import '../models/news_article.dart';
 
 class ArticleListCard extends StatelessWidget {
@@ -23,26 +23,10 @@ class ArticleListCard extends StatelessWidget {
       child: Row(
         children: [
           // Thumbnail
-          ClipRRect(
+          MohanaCover.square(
+            url: article.imageUrl,
+            size: 100,
             borderRadius: MohanaRadius.mdAll,
-            child: CachedNetworkImage(
-              imageUrl: article.imageUrl,
-              width: 100,
-              height: 100,
-              fit: BoxFit.cover,
-              placeholder: (_, _) => Container(
-                width: 100,
-                height: 100,
-                color: MohanaColors.surfaceContainerLow,
-              ),
-              errorWidget: (_, _, _) => Container(
-                width: 100,
-                height: 100,
-                color: MohanaColors.surfaceContainerLow,
-                child: const Icon(Icons.image_outlined,
-                    color: MohanaColors.onSurfaceVariant),
-              ),
-            ),
           ),
           const SizedBox(width: MohanaSpacing.md),
           // Content

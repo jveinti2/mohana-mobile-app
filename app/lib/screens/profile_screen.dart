@@ -430,7 +430,7 @@ class _FooterText extends StatelessWidget {
     return Column(
       children: [
         Image.asset(
-          'assets/images/logo_ofp.jpeg',
+          'assets/images/logo_ofp.png',
           height: 48,
           fit: BoxFit.contain,
         ),

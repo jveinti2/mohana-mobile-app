@@ -52,6 +52,14 @@ class MohanaColors {
   static const surfaceContainerHigh = Color(0xFFE2E1E8);
   static const surfaceDim = Color(0xFFD4D3DC);
 
+  // ── Fondo tonal del feed (gradiente monocromo de marca) ───────
+  /// Lila de marca — cabecera del fondo tonal (home, podcasts).
+  static const tonalTop = Color(0xFFD4A3D6);
+  /// Paso intermedio del gradiente tonal.
+  static const tonalMid = Color(0xFFE7D4EF);
+  /// Lila casi blanco — pie del gradiente, bajo la barra del reproductor.
+  static const tonalBottom = Color(0xFFF6EDF9);
+
   // ── On-colors (text/icons) ─────────────────────────────────
   static const onPrimary = Color(0xFFFFFFFF);
   static const onSecondary = Color(0xFF5C1F6A);
@@ -162,10 +170,26 @@ class MohanaGradients {
     end: Alignment.bottomCenter,
   );
 
-  /// Home tonal background — lila de marca arriba, durazno cálido abajo.
+  /// Home tonal background — monocromo de la escala primary: lila de marca
+  /// arriba, aclarándose hasta casi blanco al pie. El stop intermedio
+  /// concentra la intensidad en el tercio superior.
   /// Da identidad al feed; las cards van en blanco para contraste.
   static const homeTonal = LinearGradient(
-    colors: [Color(0xFFE3C2EA), Color(0xFFF0CBA8)],
+    colors: [
+      MohanaColors.tonalTop,
+      MohanaColors.tonalMid,
+      MohanaColors.tonalBottom,
+    ],
+    stops: [0.0, 0.45, 1.0],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+
+  /// Fondo del reproductor de episodios — morado profundo, para distinguirlo
+  /// de un vistazo del reproductor en vivo, que es claro.
+  static const player = LinearGradient(
+    colors: [Color(0xFF6A2575), Color(0xFF4A155C), Color(0xFF2E0B3A)],
+    stops: [0.0, 0.55, 1.0],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );

@@ -67,7 +67,6 @@ class _PublishScreenState extends State<PublishScreen> {
                     style: GoogleFonts.breeSerif(
                       fontSize: 28,
                       fontWeight: FontWeight.w700,
-                      fontStyle: FontStyle.italic,
                       color: MohanaColors.primary,
                     ),
                   ),

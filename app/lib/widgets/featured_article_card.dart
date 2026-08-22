@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/theme.dart';
+import 'mohana_cover.dart';
 import '../models/news_article.dart';
 
 class FeaturedArticleCard extends StatelessWidget {
@@ -27,18 +27,7 @@ class FeaturedArticleCard extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             // Image
-            CachedNetworkImage(
-              imageUrl: article.imageUrl,
-              fit: BoxFit.cover,
-              placeholder: (_, _) => Container(
-                color: MohanaColors.surfaceContainerHigh,
-              ),
-              errorWidget: (_, _, _) => Container(
-                color: MohanaColors.surfaceContainerHigh,
-                child: const Icon(Icons.image_outlined,
-                    size: 48, color: MohanaColors.onSurfaceVariant),
-              ),
-            ),
+            MohanaCover(url: article.imageUrl),
             // Dark gradient overlay
             Container(
               decoration: const BoxDecoration(

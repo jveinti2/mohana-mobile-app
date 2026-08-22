@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../config/theme.dart';
+import '../widgets/mohana_cover.dart';
 import '../models/news_article.dart';
 
 class ArticleDetailScreen extends StatelessWidget {
@@ -28,24 +28,7 @@ class ArticleDetailScreen extends StatelessWidget {
               onPressed: () => Navigator.of(context).pop(),
             ),
             flexibleSpace: FlexibleSpaceBar(
-              background: article.imageUrl.isNotEmpty
-                  ? CachedNetworkImage(
-                      imageUrl: article.imageUrl,
-                      fit: BoxFit.cover,
-                      placeholder: (_, _) => Container(
-                        color: MohanaColors.surfaceContainerHigh,
-                      ),
-                      errorWidget: (_, _, _) => Container(
-                        color: MohanaColors.primary,
-                        child: const Icon(Icons.image_outlined,
-                            size: 48, color: Colors.white54),
-                      ),
-                    )
-                  : Container(
-                      color: MohanaColors.primary,
-                      child: const Icon(Icons.article_outlined,
-                          size: 64, color: Colors.white54),
-                    ),
+              background: MohanaCover(url: article.imageUrl),
             ),
           ),
 
@@ -80,8 +63,11 @@ class ArticleDetailScreen extends StatelessWidget {
                       CircleAvatar(
                         radius: 16,
                         backgroundColor: MohanaColors.primary50,
-                        child: Icon(Icons.person,
-                            size: 18, color: MohanaColors.primary),
+                        child: Icon(
+                          Icons.person,
+                          size: 18,
+                          color: MohanaColors.primary,
+                        ),
                       ),
                       const SizedBox(width: MohanaSpacing.sm),
                       Expanded(
@@ -115,9 +101,7 @@ class ArticleDetailScreen extends StatelessWidget {
 
                   // Body
                   Text(
-                    article.body.isNotEmpty
-                        ? article.body
-                        : article.summary,
+                    article.body.isNotEmpty ? article.body : article.summary,
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w400,

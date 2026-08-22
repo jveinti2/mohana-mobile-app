@@ -213,7 +213,7 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                               const SizedBox(height: MohanaSpacing.sm),
                               Image.asset(
-                                'assets/images/logo_ofp.jpeg',
+                                'assets/images/logo_ofp.png',
                                 height: 34,
                                 fit: BoxFit.contain,
                               ),

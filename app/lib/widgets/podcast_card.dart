@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/theme.dart';
+import 'mohana_cover.dart';
 import '../models/podcast_item.dart';
 
 class PodcastCard extends StatelessWidget {
@@ -24,18 +24,10 @@ class PodcastCard extends StatelessWidget {
         child: Row(
           children: [
             // Podcast cover or icon
-            ClipRRect(
+            MohanaCover.square(
+              url: p.imageUrl,
+              size: 56,
               borderRadius: MohanaRadius.mdAll,
-              child: p.imageUrl.isNotEmpty
-                  ? CachedNetworkImage(
-                      imageUrl: p.imageUrl,
-                      width: 56,
-                      height: 56,
-                      fit: BoxFit.cover,
-                      placeholder: (_, _) => _iconFallback(),
-                      errorWidget: (_, _, _) => _iconFallback(),
-                    )
-                  : _iconFallback(),
             ),
             const SizedBox(width: MohanaSpacing.md),
             // Content
@@ -77,7 +69,7 @@ class PodcastCard extends StatelessWidget {
                   ),
                   const SizedBox(height: MohanaSpacing.xxs),
                   Text(
-                    p.description,
+                    _subtitle(p),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.poppins(
@@ -94,19 +86,11 @@ class PodcastCard extends StatelessWidget {
     );
   }
 
-  Widget _iconFallback() {
-    return Container(
-      width: 56,
-      height: 56,
-      decoration: BoxDecoration(
-        color: MohanaColors.surfaceContainerLow,
-        borderRadius: MohanaRadius.mdAll,
-      ),
-      child: const Icon(
-        Icons.mic,
-        color: MohanaColors.primary,
-        size: 28,
-      ),
-    );
+  /// Descripción del programa; si viene del catálogo (aún sin feed) se usa el
+  /// conteo de episodios y, en último caso, una invitación a escucharlo.
+  String _subtitle(PodcastItem p) {
+    if (p.description.isNotEmpty) return p.description;
+    final label = p.episodesLabel;
+    return label.isNotEmpty ? label : 'Escucha los episodios del programa';
   }
 }

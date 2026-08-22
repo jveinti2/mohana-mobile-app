@@ -158,7 +158,6 @@ class MohanaTheme {
     titleTextStyle: GoogleFonts.breeSerif(
       fontSize: 20,
       fontWeight: FontWeight.w700,
-      fontStyle: FontStyle.italic,
       color: MohanaColors.primary,
     ),
     iconTheme: const IconThemeData(

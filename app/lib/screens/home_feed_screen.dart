@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/drive_config.dart';
+import '../config/ivoox_config.dart';
 import '../config/theme.dart';
 import '../models/news_article.dart';
 import '../models/podcast_item.dart';
@@ -9,14 +10,15 @@ import '../services/ivoox_service.dart';
 import '../widgets/mohana_app_bar.dart';
 import '../widgets/featured_article_card.dart';
 import '../widgets/article_list_card.dart';
+import '../widgets/load_notice.dart';
 import '../widgets/podcast_card.dart';
 import '../widgets/ivoox_section.dart';
 import '../widgets/entrance.dart';
 import '../widgets/feed_skeleton.dart';
+import '../widgets/mohana_bottom_nav.dart';
 import 'article_detail_screen.dart';
 import 'drive_diagnostic_screen.dart';
 import 'podcast_detail_screen.dart';
-import 'podcasts_library_screen.dart';
 
 class HomeFeedScreen extends StatefulWidget {
   const HomeFeedScreen({super.key});
@@ -30,6 +32,12 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
   bool _loading = true;
   String? _error;
 
+  /// Catálogo de programas de iVoox. Solo nombre y carátula: los episodios se
+  /// descargan al abrir cada programa, no en el arranque.
+  List<IvooxProgramRef> _catalog = const [];
+  bool _podcastsLoading = false;
+  bool _catalogStale = false;
+
   /// IDs de artículos ya animados, para no re-animar al volver a hacer scroll.
   final Set<String> _seenIds = <String>{};
 
@@ -39,82 +47,83 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
     _loadContent();
   }
 
-  Future<void> _loadContent() async {
+  /// Carga en dos fases para que la pantalla no espere a lo más lento:
+  /// primero los artículos de Drive (y muere el esqueleto), después el
+  /// catálogo de iVoox, que va rellenando la fila de podcasts según llega.
+  Future<void> _loadContent({bool force = false}) async {
+    setState(() => _podcastsLoading = true);
+
     if (!DriveConfig.isConfigured) {
       setState(() {
         _loading = false;
         _error = 'Drive no configurado';
       });
-      return;
-    }
-
-    try {
-      final content = await ContentService.loadHomeContent();
-
-      // Podcasts desde iVoox (reemplazan los de Drive si la carga funciona).
-      // En web puede fallar por CORS; en ese caso se mantienen los de Drive.
-      var podcasts = content.podcasts;
-      var podcastDestacado = content.podcastDestacado;
+    } else {
       try {
-        final ivoox = await IvooxService.fetchPrograms();
-        if (ivoox.isNotEmpty) {
-          podcasts = ivoox;
-          podcastDestacado = ivoox.first;
-        }
-      } catch (_) {
-        // Silencioso: se conserva el contenido de Drive como respaldo.
-      }
-
-      final merged = HomeContent(
-        titular: content.titular,
-        articulos: content.articulos,
-        podcasts: podcasts,
-        podcastDestacado: podcastDestacado,
-      );
-
-      if (mounted) {
+        final content = await ContentService.loadHomeContent(
+          forceRefresh: force,
+        );
+        if (!mounted) return;
         setState(() {
-          _content = merged;
+          _content = content;
           _loading = false;
           _error = null;
         });
-      }
-    } catch (e) {
-      if (mounted) {
+      } catch (e) {
+        if (!mounted) return;
         setState(() {
           _error = e.toString();
           _loading = false;
         });
       }
     }
+
+    // Los podcasts vienen de iVoox: se cargan aunque Drive falle.
+    await _loadCatalog(force: force);
   }
+
+  Future<void> _loadCatalog({bool force = false}) async {
+    final catalog = await IvooxService.loadCatalog(
+      forceRefresh: force,
+      // Cada página del catálogo que llega se pinta ya, sin esperar al resto.
+      onProgress: (partial) {
+        if (!mounted) return;
+        setState(() => _catalog = partial);
+      },
+    );
+    if (!mounted) return;
+    setState(() {
+      _catalog = catalog.programs;
+      _catalogStale = catalog.isStale;
+      _podcastsLoading = false;
+    });
+  }
+
+  /// Programas del catálogo como tarjetas (con episodios si ya se cargaron).
+  List<PodcastItem> get _podcasts => [
+    for (final ref in _catalog) IvooxService.stubFor(ref),
+  ];
+
+  /// Podcast destacado: el primero del catálogo de iVoox (la emisora lo ordena
+  /// por actividad reciente). Si iVoox no respondió, el de Drive.
+  PodcastItem? get _featuredPodcast => _catalog.isNotEmpty
+      ? IvooxService.stubFor(_catalog.first)
+      : _content?.podcastDestacado;
 
   void _openArticle(NewsArticle article) {
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ArticleDetailScreen(article: article),
-      ),
+      MaterialPageRoute(builder: (_) => ArticleDetailScreen(article: article)),
     );
   }
 
   void _openPodcast(PodcastItem podcast) {
-    if (podcast.episodeList.isEmpty) return;
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => PodcastDetailScreen(program: podcast),
-      ),
+      MaterialPageRoute(builder: (_) => PodcastDetailScreen(program: podcast)),
     );
   }
 
-  void _openPodcastLibrary() {
-    final podcasts = _content?.podcasts ?? const [];
-    if (podcasts.isEmpty) return;
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => PodcastsLibraryScreen(podcasts: podcasts),
-      ),
-    );
-  }
+  /// "Ver todos" lleva a la pestaña de Podcasts, no a otra pantalla apilada.
+  void _openPodcastLibrary() => AppTabs.go(MohanaTab.podcasts);
 
   @override
   Widget build(BuildContext context) {
@@ -136,20 +145,19 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
     final content = _content;
     if (content == null || _error != null) return _buildEmpty();
 
+    final podcasts = _podcasts;
+
     return RefreshIndicator(
       color: MohanaColors.primary,
-      onRefresh: () async {
-        setState(() => _loading = true);
-        await _loadContent();
-      },
+      // No se vuelve al esqueleto completo: el indicador ya da feedback y el
+      // contenido actual sigue visible mientras se revalida.
+      onRefresh: () => _loadContent(force: true),
       child: CustomScrollView(
         physics: const BouncingScrollPhysics(
           parent: AlwaysScrollableScrollPhysics(),
         ),
         slivers: [
-          const SliverToBoxAdapter(
-            child: SizedBox(height: MohanaSpacing.base),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: MohanaSpacing.base)),
 
           // Featured article (titular)
           if (content.titular != null) ...[
@@ -159,9 +167,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                 child: SectionEyebrow('Destacado'),
               ),
             ),
-            const SliverToBoxAdapter(
-              child: SizedBox(height: MohanaSpacing.md),
-            ),
+            const SliverToBoxAdapter(child: SizedBox(height: MohanaSpacing.md)),
             SliverToBoxAdapter(
               child: StaggeredEntrance(
                 index: 1,
@@ -171,9 +177,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                 ),
               ),
             ),
-            const SliverToBoxAdapter(
-              child: SizedBox(height: MohanaSpacing.xl),
-            ),
+            const SliverToBoxAdapter(child: SizedBox(height: MohanaSpacing.xl)),
           ],
 
           // Article list
@@ -184,9 +188,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                 child: SectionEyebrow('Lo más reciente'),
               ),
             ),
-            const SliverToBoxAdapter(
-              child: SizedBox(height: MohanaSpacing.md),
-            ),
+            const SliverToBoxAdapter(child: SizedBox(height: MohanaSpacing.md)),
             SliverList.separated(
               itemCount: content.articulos.length,
               itemBuilder: (_, index) {
@@ -210,40 +212,57 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
             child: SizedBox(height: MohanaSpacing.sectionGap),
           ),
 
-          // Podcasts section
-          if (content.podcasts.isNotEmpty)
+          // Podcasts: cabecera + fila. Mientras llega el catálogo se muestra
+          // su propio esqueleto, sin bloquear el resto del feed.
+          if (_podcastsLoading && podcasts.isEmpty) ...[
+            const SliverToBoxAdapter(child: IvooxSectionHeader()),
+            const SliverToBoxAdapter(
+              child: SizedBox(height: MohanaSpacing.base),
+            ),
+            const SliverToBoxAdapter(child: PodcastRowSkeleton()),
+          ] else if (podcasts.isNotEmpty)
             SliverToBoxAdapter(
               child: StaggeredEntrance(
                 index: 0,
                 child: IvooxSection(
-                  podcasts: content.podcasts,
+                  podcasts: podcasts,
                   onPodcastTap: _openPodcast,
                   onSeeAll: _openPodcastLibrary,
                 ),
               ),
             ),
 
-          if (content.podcasts.isNotEmpty)
+          if (_catalogStale) ...[
             const SliverToBoxAdapter(
-              child: SizedBox(height: MohanaSpacing.xl),
+              child: SizedBox(height: MohanaSpacing.base),
             ),
+            SliverToBoxAdapter(
+              child: LoadNotice(
+                message: 'No se pudo actualizar la lista de programas',
+                detail: 'Se muestra la última que se guardó en el dispositivo.',
+                onRetry: () => _loadCatalog(force: true),
+                busy: _podcastsLoading,
+              ),
+            ),
+          ],
+
+          if (podcasts.isNotEmpty || _podcastsLoading)
+            const SliverToBoxAdapter(child: SizedBox(height: MohanaSpacing.xl)),
 
           // Featured podcast
-          if (content.podcastDestacado != null)
+          if (_featuredPodcast != null)
             SliverToBoxAdapter(
               child: StaggeredEntrance(
                 index: 1,
                 child: PressableScale(
-                  onTap: () => _openPodcast(content.podcastDestacado!),
-                  child: PodcastCard(podcast: content.podcastDestacado),
+                  onTap: () => _openPodcast(_featuredPodcast!),
+                  child: PodcastCard(podcast: _featuredPodcast),
                 ),
               ),
             ),
 
           // Bottom clearance
-          const SliverToBoxAdapter(
-            child: SizedBox(height: MohanaSpacing.xxl),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: MohanaSpacing.xxl)),
         ],
       ),
     );
@@ -257,7 +276,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
           _loading = true;
           _error = null;
         });
-        await _loadContent();
+        await _loadContent(force: true);
       },
       child: CustomScrollView(
         physics: const BouncingScrollPhysics(
