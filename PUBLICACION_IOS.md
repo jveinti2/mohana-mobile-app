@@ -8,66 +8,51 @@ y se firma en la nube. Hay un iPhone disponible para probar y tomar capturas.
 
 ---
 
-## 1. Cuenta de Apple Developer — BLOQUEADO, a definir con el cliente
+## 1. Cuenta de Apple Developer — DECIDIDO (09/11/2026)
 
-Hay que elegir entre dos vías antes de tocar nada de Apple.
+**Se compra la cuenta individual ahora y se migra a la OFP después.** Decisión del
+cliente: salir cuanto antes pesa más que ahorrarse la cuota.
 
-| | Individual | Organización (OFP) |
-|---|---|---|
-| Coste | **459.900 COP/año** | **0** (exención para ONG) |
-| Trámite previo | ninguno | D-U-N-S, 1–2 semanas |
-| Nombre en la ficha | Jhonatan Becerra Pedrozo | Organización Femenina Popular |
-| Titularidad | personal | de la OFP |
+- [ ] Inscribirse desde la app Apple Developer en el iPhone → *Individual / Sole
+      Proprietor* → verificar identidad con cédula (el nombre debe coincidir
+      **exacto** con el documento; es el fallo más común) → pagar 459.900 COP.
 
-### Sobre el precio en pesos
+### Lo que esto implica
 
-Apple cobra 459.900 COP, no los ~320.000 que darían 99 USD a la TRM. La diferencia
-es IVA del 19 % más una tasa de cambio fija propia de Apple (~3.900 COP/USD) que no
-se actualiza con el mercado. No depende de ninguna configuración del teléfono: lo
-determina el país del Apple ID y la dirección de facturación.
+La ficha saldrá a nombre de **Jhonatan Becerra Pedrozo**, no de la Organización
+Femenina Popular, y la cuenta queda atada a una persona. Son 459.900 COP al año
+hasta que se complete la migración.
 
-### Sobre la exención de cuota
+Sobre el precio: Apple cobra 459.900 COP y no los ~320.000 que darían 99 USD a la
+TRM. La diferencia es el IVA del 19 % más una tasa de cambio fija propia de Apple
+(~3.900 COP/USD) que no sigue al mercado. No depende de ninguna configuración del
+teléfono: lo determina el país del Apple ID.
 
-Apple exime la cuota anual completa a organizaciones sin ánimo de lucro reconocidas
-oficialmente. La OFP califica: es entidad legal con NIT, la app es gratuita y no
-vende bienes ni servicios digitales. Dos condiciones que hay que respetar:
+### La migración posterior
 
-- Una persona natural **no** puede pedirla. Exige inscribirse como organización.
-- Se solicita **durante** la inscripción. No se puede añadir después.
-
-### Si se paga ahora como individuo, ¿se puede pasar luego a la OFP?
-
-Sí, con un **App Transfer**, y los usuarios no notan nada. Verificado contra la
+Se hace con un **App Transfer**, y los usuarios no notan nada. Verificado contra la
 documentación de Apple y contra las dependencias de esta app, que no usa iCloud,
 Apple Pay, Sign in with Apple, Game Center, Wallet, keychain compartido ni push —
-que son justo lo que complica una transferencia. La de esta app sale limpia.
+que es justo lo que complica una transferencia. Se conservan el bundle ID, la URL
+de App Store, reseñas, valoraciones y las actualizaciones para quien ya la tenga
+instalada. Lo único que cambia a la vista es el nombre del desarrollador.
 
-Se conservan el bundle ID, la URL de App Store, reseñas, valoraciones y los usuarios
-existentes, que siguen recibiendo actualizaciones. Lo único que cambia a la vista es
-el nombre del desarrollador.
+Para que la cuenta de la OFP salga gratis, al inscribirla hay que pedir la
+**exención de cuota** para organizaciones sin ánimo de lucro, y pedirla *durante*
+su inscripción: no se puede añadir después. La OFP califica (entidad legal con NIT,
+app gratuita que no vende nada), pero exige el trámite del D-U-N-S, de 1 a 2
+semanas.
 
-Condiciones de la transferencia:
+Condiciones de la transferencia, para cuando toque:
 
-- La app debe estar ya publicada (al menos una versión en App Store).
+- La app debe estar ya publicada en App Store.
 - Antes de iniciarla hay que borrar todos los builds y testers de TestFlight y
   vaciar los campos de Test Information.
-- La cuenta de la OFP debe estar inscrita y aprobada **antes**, con su exención
-  pedida en su propia inscripción.
-- El historial de analítica se queda en la cuenta de origen; la OFP arranca el suyo
-  desde la transferencia. Para una app gratuita es irrelevante.
+- La cuenta de la OFP debe estar inscrita y aprobada **antes** de iniciarla.
+- El historial de analítica se queda en la cuenta de origen. Para una app gratuita
+  es irrelevante.
 
-Conclusión: pagar ahora no encierra en nada. Los 459.900 compran tiempo, nada más.
-Si el trámite del D-U-N-S se alarga más de un año, se pagaría una segunda anualidad.
-
-### Acciones según la vía
-
-- [ ] **Vía organización:** pedir D-U-N-S con RUT y certificado de existencia →
-      inscribirse como organización → marcar la exención durante la inscripción.
-- [ ] **Vía individual:** inscribirse desde la app Apple Developer en el iPhone →
-      elegir *Individual / Sole Proprietor* → verificar identidad con cédula (el
-      nombre debe coincidir **exacto**, es el fallo más común) → pagar.
-
----
+Conviene no dejarlo pasar de un año, o se pagará una segunda anualidad.
 
 ## 2. Cambios de código iOS — HECHO (05/11/2026)
 
@@ -103,38 +88,41 @@ es la versión de `pubspec.yaml`: los builds que se gasten en TestFlight consume
 números de build, así que el `versionCode` de la próxima versión de Android arrancará
 más alto. Play Store solo exige que sea mayor que el último publicado, no consecutivo.
 
-## 3. Política de privacidad — página lista, falta activarla
+## 3. Política de privacidad y soporte — LISTO, falta activar Pages
 
-Dos versiones del mismo texto: `documentos/politica-privacidad.md` (para que la OFP
-lo revise y edite) y `docs/index.html` (la página que se publica, ya con la identidad
-visual de la emisora).
+Dos páginas en `docs/`, ya con el correo de la OFP (Comunicaciones.ofp@gmail.com)
+y fecha del 9 de noviembre de 2026:
 
-Refleja la realidad de la app: no recoge ningún dato, solo guarda caché local, y lista
-los terceros a los que se conecta (Zeno.fm, iVoox, Hygraph, Google Fonts).
+- `docs/index.html` — política de privacidad. Refleja la realidad de la app: no
+  recoge ningún dato, solo guarda caché local, y lista los terceros a los que se
+  conecta (Zeno.fm, iVoox, Hygraph, Google Fonts).
+- `docs/soporte.html` — página de soporte con contacto y preguntas frecuentes.
+  Apple exige una **URL** de soporte y no admite un correo; como la OFP no tiene
+  web, se resuelve aquí.
 
-- [ ] Que la OFP complete el correo de contacto y la fecha, y revise el texto.
-- [ ] **Activar GitHub Pages** en este mismo repositorio, que es público:
-      Settings → Pages → Source: *Deploy from a branch* → rama `main`, carpeta
-      `/docs` → Save. En un par de minutos queda en
-      `https://jveinti2.github.io/mohana-mobile-app/`.
-- [ ] Esa URL va en App Store Connect y no puede caerse: Apple la revisa en cada
-      actualización, y si deja de responder puede retirar la app.
+El mismo texto de la política queda en `documentos/politica-privacidad.md` para
+que la OFP lo edite sin tocar HTML.
 
-Si la OFP tiene dominio propio, es mejor alojarla ahí: una URL institucional da más
-confianza que una de GitHub, y no queda atada a una cuenta personal. GitHub Pages
-sirve perfectamente mientras tanto.
+- [ ] **Activar GitHub Pages**: Settings → Pages → *Deploy from a branch* → rama
+      `main`, carpeta `/docs` → Save.
+- [ ] Comprobar que las dos URLs responden antes de enviar a revisión. Apple las
+      revisa en cada actualización y, si dejan de responder, puede retirar la app.
 
-Sin esta URL **no se puede enviar a revisión**.
+Si algún día la OFP tiene dominio propio, conviene mudarlas allí: una URL
+institucional no queda atada a una cuenta personal de GitHub.
 
-## 4. Textos de la ficha — borrador listo
+## 4. Textos de la ficha — LISTO
 
-Borrador en `documentos/ficha-app-store.md`: nombre, subtítulo, descripción,
-palabras clave, categoría, clasificación por edad, texto para el revisor y notas
-de versión.
+Todo en `documentos/ficha-app-store.md`, listo para copiar en App Store Connect:
+nombre, subtítulo, descripción (con el párrafo sobre la OFP ya redactado),
+palabras clave, categoría, clasificación por edad, URLs, texto para el revisor y
+notas de versión.
 
-- [ ] Que la OFP complete el párrafo sobre quiénes son y las redes sociales.
-- [ ] Definir URL de soporte.
-- [ ] Confirmar la clasificación por edad según el contenido real de los programas.
+Clasificación por edad: Apple ya no deja elegirla, la calcula desde un
+cuestionario cuyos tramos son 4+, 9+, 13+, 16+ y 18+. Las respuestas recomendadas
+están en el documento y dan **13+**. La emisora trata sociedad, política y opinión
+pública, y el directo va sin guion: declarar 4+ es lo que expone a un rechazo por
+haber declarado de menos.
 
 ## 4 bis. Pantalla «Nosotras» — HECHO (09/11/2026)
 
@@ -148,10 +136,9 @@ un rechazo casi seguro.
       dentro de la organización. Texto corto a propósito.
 - [x] `flutter analyze` limpio y los 307 tests pasan, incluidos los de desbordes en
       cinco tamaños de pantalla por tres escalas de letra.
-- [ ] **Que la OFP confirme las cifras** (1972, +10 municipios, 2.700 mujeres).
-      Salen de prensa y de fuentes académicas, no de la propia organización.
-- [ ] Decidir si se añaden enlaces a su web y redes. Se dejaron fuera porque
-      `ofp.org.co` no respondía al comprobarlo.
+- [x] Cifras confirmadas por el cliente (1972, +10 municipios, 2.700 mujeres).
+- [x] Sin enlaces a web ni redes: la OFP no considera necesario comunicarlas aquí,
+      y `ofp.org.co` no respondía al comprobarlo.
 
 ## 5. App Store Connect — requiere la cuenta activa
 
@@ -200,11 +187,16 @@ plano.
 
 ---
 
-## Orden de dependencias
+## Estado
+
+Hecho: pasos 2, 3 (falta un clic en GitHub), 4 y 4 bis.
+Pendiente: comprar la cuenta (paso 1) — desbloquea los pasos 5 a 8, que van en
+orden y no se pueden adelantar.
 
 ```
-1 (cuenta) ──────────────► 5 ──► 6 ──► 7 ──► 8
-2, 3, 4 (en paralelo) ─────────────────────┘
+1 (cuenta) ──► 5 (App Store Connect) ──► 6 (Codemagic) ──► 7 (TestFlight) ──► 8 (envío)
 ```
 
-Los pasos 2, 3 y 4 no dependen de Apple y pueden avanzar mientras se decide el 1.
+Plazo estimado desde que exista la cuenta: **1 a 2 semanas**. Cinco días si todo
+sale limpio; dos semanas si Apple rechaza la primera entrega, que es frecuente en
+la primera app de una cuenta.

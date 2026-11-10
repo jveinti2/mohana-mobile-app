@@ -1,7 +1,7 @@
 # Ficha de App Store — La Mohana 91.2 FM
 
-> BORRADOR para revisión de la OFP. Lo marcado entre corchetes está pendiente.
-> Los límites de caracteres son los que impone Apple.
+> Textos listos para copiar en App Store Connect. Los límites de caracteres son
+> los que impone Apple.
 
 ## Nombre (30 caracteres máx.)
 
@@ -48,11 +48,13 @@ Reproduce, pausa y cambia de episodio sin desbloquear el teléfono.
 
 Sin registro, sin publicidad y sin recoger datos personales.
 
-Sobre la Organización Femenina Popular
-[PÁRRAFO A REDACTAR POR LA OFP: dos o tres frases sobre quiénes son, desde
-cuándo, y qué defienden. Apple valora que se explique el origen del contenido.]
-
-Síguenos en [REDES SOCIALES DE LA EMISORA]
+SOBRE LA ORGANIZACIÓN FEMENINA POPULAR
+Somos una organización de mujeres nacida en 1972 en el nororiente de
+Barrancabermeja. Desde 1988 caminamos de forma autónoma y, en medio del
+conflicto armado del Magdalena Medio, hemos sostenido la vida: en 1996
+impulsamos el Movimiento Social de Mujeres contra la Guerra y por la Paz, y hoy
+las Casas de la Mujer reúnen a miles de mujeres en más de diez municipios de la
+región. La Mohana 91.2 FM es nuestra voz.
 ```
 
 ## Palabras clave (100 caracteres máx., separadas por comas, sin espacios)
@@ -73,18 +75,43 @@ la emisora. Competir en Noticias es más duro.
 
 ## Clasificación por edad
 
-Esperada: **4+**, salvo que los programas traten con frecuencia temas de
-violencia o conflicto armado con lenguaje explícito. Si es el caso, declararlo
-en el cuestionario como contenido ocasional y la clasificación subirá a 12+.
-No pasa nada por ello — lo que sí genera rechazo es declarar de menos.
+Apple ya no deja elegir la clasificación: la calcula a partir de un cuestionario,
+y desde 2026 los tramos son 4+, 9+, 13+, 16+ y 18+. Respuestas recomendadas para
+esta app, dado que se tratan temas de sociedad, política y opinión pública, y que
+el directo es en vivo y sin guion:
+
+| Pregunta | Respuesta |
+|---|---|
+| Violencia realista | Poco frecuente o leve |
+| Temas maduros o sugerentes | Poco frecuente o leve |
+| Lenguaje soez | Poco frecuente o leve |
+| Violencia de dibujos o fantasía, terror, sexo, desnudos, drogas, alcohol, tabaco, juego | Ninguno |
+| Acceso web sin restricciones | No |
+| Funciones de redes sociales | No |
+| Controles parentales dentro de la app | No |
+
+Resultado esperado: **13+**.
+
+Declarar 4+ sería lo arriesgado. La emisora cubre conflicto armado y derechos
+humanos, y el directo no está guionizado: si el revisor escucha algo que no
+encaja con un 4+, el rechazo es por haber declarado de menos. 13+ no penaliza la
+visibilidad y deja la declaración a salvo.
 
 ## URL de soporte (obligatoria)
 
-[URL — puede ser la web de la OFP o una página de contacto]
+```
+https://jveinti2.github.io/mohana-mobile-app/soporte.html
+```
+
+Apple exige una URL, no vale un correo. Como la OFP no tiene web, la página de
+soporte se publica junto a la de privacidad, con el contacto y unas preguntas
+frecuentes.
 
 ## URL de política de privacidad (obligatoria)
 
-[URL donde se publique `politica-privacidad.md`]
+```
+https://jveinti2.github.io/mohana-mobile-app/
+```
 
 ## Texto para el revisor de Apple
 

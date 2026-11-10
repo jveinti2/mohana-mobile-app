@@ -1,10 +1,6 @@
 # Política de Privacidad — La Mohana 91.2 FM
 
-**Última actualización:** [FECHA DE PUBLICACIÓN]
-
-> BORRADOR. Antes de publicar, la OFP debe revisar y completar lo marcado entre
-> corchetes. Después hay que subirlo a una URL pública y estable (ver
-> `PUBLICACION_IOS.md`, paso 3).
+**Última actualización:** 9 de noviembre de 2026
 
 ## Quiénes somos
 
@@ -13,7 +9,7 @@ La aplicación **La Mohana 91.2 FM** es desarrollada y operada por la
 Santander, Colombia.
 
 Para cualquier consulta sobre esta política o sobre tus datos, escríbenos a
-**[CORREO DE CONTACTO DE LA OFP]**.
+**Comunicaciones.ofp@gmail.com**.
 
 ## Resumen
 
@@ -71,7 +67,7 @@ controlas tú: puedes borrarlos desinstalando la app o limpiando sus datos desde
 los ajustes del teléfono.
 
 Conforme a la Ley 1581 de 2012 de Colombia, puedes escribirnos a
-**[CORREO DE CONTACTO DE LA OFP]** para cualquier consulta sobre el tratamiento
+**Comunicaciones.ofp@gmail.com** para cualquier consulta sobre el tratamiento
 de datos.
 
 ## Cambios en esta política
