@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  El icono de la notificación de medios se resuelve por nombre en tiempo de
+  ejecución (`androidNotificationIcon: 'drawable/ic_notificacion'` en main.dart,
+  que audio_service traduce con getIdentifier). El shrinker de recursos no ve
+  esa referencia y lo borra de la release: en depuración la notificación sale
+  bien y en el bundle firmado se queda sin icono. Esto lo retiene.
+-->
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_notificacion" />
