@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mohana/widgets/mohana_cover.dart';
 
 /// El respaldo de imagen tiene que valer para cualquier sección: da igual si
-/// el contenido viene de iVoox o de Drive, si no trae carátula se ve el logo
+/// el contenido viene de iVoox o del CMS, si no trae carátula se ve el logo
 /// de la emisora y nunca un hueco.
 void main() {
   Future<void> pumpCover(WidgetTester tester, Widget cover) {

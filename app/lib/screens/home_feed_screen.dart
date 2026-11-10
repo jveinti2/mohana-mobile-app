@@ -1,12 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../config/drive_config.dart';
+import '../config/hygraph_config.dart';
 import '../config/ivoox_config.dart';
 import '../config/theme.dart';
 import '../models/news_article.dart';
 import '../models/podcast_item.dart';
 import '../services/content_service.dart';
 import '../services/ivoox_service.dart';
+import '../services/schedule_service.dart';
 import '../widgets/mohana_app_bar.dart';
 import '../widgets/featured_article_card.dart';
 import '../widgets/article_list_card.dart';
@@ -16,8 +19,9 @@ import '../widgets/ivoox_section.dart';
 import '../widgets/entrance.dart';
 import '../widgets/feed_skeleton.dart';
 import '../widgets/mohana_bottom_nav.dart';
+import '../widgets/on_air_card.dart';
 import 'article_detail_screen.dart';
-import 'drive_diagnostic_screen.dart';
+import 'cms_diagnostic_screen.dart';
 import 'podcast_detail_screen.dart';
 
 class HomeFeedScreen extends StatefulWidget {
@@ -48,15 +52,23 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
   }
 
   /// Carga en dos fases para que la pantalla no espere a lo más lento:
-  /// primero los artículos de Drive (y muere el esqueleto), después el
+  /// primero los artículos del CMS (y muere el esqueleto), después el
   /// catálogo de iVoox, que va rellenando la fila de podcasts según llega.
   Future<void> _loadContent({bool force = false}) async {
     setState(() => _podcastsLoading = true);
 
-    if (!DriveConfig.isConfigured) {
+    // La parrilla es un archivo pequeño y opcional: se pide aparte para que un
+    // fallo suyo no arrastre al resto del feed.
+    unawaited(
+      ScheduleService.load(forceRefresh: force).then((_) {
+        if (mounted) setState(() {});
+      }),
+    );
+
+    if (!HygraphConfig.isConfigured) {
       setState(() {
         _loading = false;
-        _error = 'Drive no configurado';
+        _error = 'CMS no configurado';
       });
     } else {
       try {
@@ -78,7 +90,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
       }
     }
 
-    // Los podcasts vienen de iVoox: se cargan aunque Drive falle.
+    // Los podcasts vienen de iVoox: se cargan aunque el CMS falle.
     await _loadCatalog(force: force);
   }
 
@@ -105,7 +117,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
   ];
 
   /// Podcast destacado: el primero del catálogo de iVoox (la emisora lo ordena
-  /// por actividad reciente). Si iVoox no respondió, el de Drive.
+  /// por actividad reciente). Si iVoox no respondió, el del CMS.
   PodcastItem? get _featuredPodcast => _catalog.isNotEmpty
       ? IvooxService.stubFor(_catalog.first)
       : _content?.podcastDestacado;
@@ -157,20 +169,27 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
           parent: AlwaysScrollableScrollPhysics(),
         ),
         slivers: [
-          const SliverToBoxAdapter(child: SizedBox(height: MohanaSpacing.base)),
+          const SliverToBoxAdapter(child: SizedBox(height: MohanaSpacing.md)),
+
+          // El directo primero: es una emisora, y hasta ahora el stream solo
+          // vivía en la barra de abajo.
+          const SliverToBoxAdapter(
+            child: StaggeredEntrance(index: 0, child: OnAirCard()),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: MohanaSpacing.xl)),
 
           // Featured article (titular)
           if (content.titular != null) ...[
             const SliverToBoxAdapter(
               child: StaggeredEntrance(
-                index: 0,
+                index: 1,
                 child: SectionEyebrow('Destacado'),
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: MohanaSpacing.md)),
             SliverToBoxAdapter(
               child: StaggeredEntrance(
-                index: 1,
+                index: 2,
                 child: PressableScale(
                   onTap: () => _openArticle(content.titular!),
                   child: FeaturedArticleCard(article: content.titular!),
@@ -184,7 +203,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
           if (content.articulos.isNotEmpty) ...[
             const SliverToBoxAdapter(
               child: StaggeredEntrance(
-                index: 2,
+                index: 3,
                 child: SectionEyebrow('Lo más reciente'),
               ),
             ),
@@ -333,7 +352,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                         onPressed: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) => const DriveDiagnosticScreen(),
+                              builder: (_) => const CmsDiagnosticScreen(),
                             ),
                           );
                         },

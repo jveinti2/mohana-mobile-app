@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.1.0+8
+version: 1.3.0+12
 
 environment:
   sdk: ^3.11.1
@@ -40,6 +40,8 @@ dependencies:
   share_plus: ^10.1.4
   xml: ^6.5.0
   shared_preferences: ^2.3.0
+  just_audio_background: ^0.0.1-beta.17
+  path_provider: ^2.1.6
 
 dev_dependencies:
   flutter_test:
@@ -51,6 +53,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -92,3 +95,27 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# ─── Icono de la app ──────────────────────────────────────────────
+#
+# El icono es el mismo que el de la ficha de Play Store
+# (`docs/icon_512x512.png`): el logotipo de la emisora sobre blanco.
+#
+# `icon.png` es la composición completa, para iOS y para los Android
+# anteriores al icono adaptativo. `icon_foreground.png` lleva el mismo
+# logotipo pero más recogido: en un icono adaptativo el lanzador solo
+# garantiza el 66 % central, así que lo que se salga de ahí puede recortarse.
+#
+# Se regenera con:  dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/icon/icon.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+  # Sin margen extra: el propio `icon_foreground.png` ya reserva el suyo, y el
+  # 16 % que mete la herramienta por su cuenta dejaría el logotipo diminuto.
+  adaptive_icon_foreground_inset: 0
+  # iOS no admite transparencia en el icono de la app.
+  remove_alpha_ios: true
+  min_sdk_android: 21

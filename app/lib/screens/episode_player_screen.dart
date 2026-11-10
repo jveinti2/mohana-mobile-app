@@ -90,11 +90,17 @@ class EpisodePlayerScreen extends StatelessWidget {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   // La carátula cede espacio en pantallas bajas para que los
-                  // controles nunca queden fuera.
-                  final cover = (constraints.maxWidth * 0.68).clamp(
-                    140.0,
-                    constraints.maxHeight * 0.42,
-                  );
+                  // controles nunca queden fuera: manda la medida más corta de
+                  // las dos, con un suelo para que siga siendo una portada.
+                  //
+                  // Antes esto era un `clamp(140, alto * 0.42)`, y ahí estaba
+                  // el reproductor roto: con el teléfono en horizontal el 42 %
+                  // del alto baja de 140, el rango queda invertido y `clamp`
+                  // lanza. La pantalla no se pintaba.
+                  final porAncho = constraints.maxWidth * 0.68;
+                  final porAlto = constraints.maxHeight * 0.42;
+                  final menor = porAncho < porAlto ? porAncho : porAlto;
+                  final cover = menor < 80 ? 80.0 : menor;
 
                   return SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
@@ -302,35 +308,41 @@ class _Controls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _IconAction(
-          icon: Icons.skip_previous_rounded,
-          size: 30,
-          tooltip: 'Episodio anterior',
-          onTap: audio.hasPrevious ? audio.skipToPrevious : null,
-        ),
-        _IconAction(
-          icon: Icons.replay_10_rounded,
-          size: 32,
-          tooltip: 'Retroceder 10 segundos',
-          onTap: audio.rewind,
-        ),
-        _PlayButton(audio: audio),
-        _IconAction(
-          icon: Icons.forward_30_rounded,
-          size: 32,
-          tooltip: 'Adelantar 30 segundos',
-          onTap: audio.fastForward,
-        ),
-        _IconAction(
-          icon: Icons.skip_next_rounded,
-          size: 30,
-          tooltip: 'Episodio siguiente',
-          onTap: audio.hasNext ? audio.skipToNext : null,
-        ),
-      ],
+    // Los mandos no siguen el tamaño de letra del sistema: son controles de
+    // 48 px, no texto, y al ampliarlos al doble los cinco no cabían de ancho
+    // en un teléfono estrecho. Lo que se lee —título, tiempos, velocidad— sí
+    // crece; esto es la botonera.
+    return MediaQuery.withNoTextScaling(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _IconAction(
+            icon: Icons.skip_previous_rounded,
+            size: 30,
+            tooltip: 'Episodio anterior',
+            onTap: audio.hasPrevious ? audio.skipToPrevious : null,
+          ),
+          _IconAction(
+            icon: Icons.replay_10_rounded,
+            size: 32,
+            tooltip: 'Retroceder 10 segundos',
+            onTap: audio.rewind,
+          ),
+          _PlayButton(audio: audio),
+          _IconAction(
+            icon: Icons.forward_30_rounded,
+            size: 32,
+            tooltip: 'Adelantar 30 segundos',
+            onTap: audio.fastForward,
+          ),
+          _IconAction(
+            icon: Icons.skip_next_rounded,
+            size: 30,
+            tooltip: 'Episodio siguiente',
+            onTap: audio.hasNext ? audio.skipToNext : null,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -431,12 +443,18 @@ class _SpeedChip extends StatelessWidget {
           children: [
             const Icon(Icons.speed_rounded, size: 16, color: Colors.white),
             const SizedBox(width: MohanaSpacing.xs),
-            Text(
-              'Velocidad $label',
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
+            // Flexible: con la letra al doble, la píldora se salía por la
+            // derecha en un teléfono estrecho.
+            Flexible(
+              child: Text(
+                'Velocidad $label',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
               ),
             ),
           ],

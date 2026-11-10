@@ -67,11 +67,27 @@ class RadioScreen extends StatelessWidget {
 class _FrequencyCircle extends StatelessWidget {
   const _FrequencyCircle();
 
+  /// Diámetro de diseño y cuerpo de la frecuencia, que van de la mano: si la
+  /// letra crece, el disco crece con ella.
+  static const _lado = 220.0;
+  static const _cuerpo = 48.0;
+
   @override
   Widget build(BuildContext context) {
+    final scaler = MediaQuery.textScalerOf(context);
+    final disponible =
+        MediaQuery.sizeOf(context).width - MohanaSpacing.screenH * 2;
+
+    // Con el diámetro clavado en 220, "91.2" ampliado por accesibilidad se
+    // partía en dos líneas y se salía del disco por abajo. Ahora el disco
+    // acompaña a la letra, sin pasar nunca del ancho de la pantalla.
+    var lado = _lado * scaler.scale(_cuerpo) / _cuerpo;
+    if (lado > disponible) lado = disponible;
+    if (lado < 120) lado = 120;
+
     return Container(
-      width: 220,
-      height: 220,
+      width: lado,
+      height: lado,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: MohanaColors.surface,
@@ -81,30 +97,53 @@ class _FrequencyCircle extends StatelessWidget {
         ),
         boxShadow: [MohanaShadows.ambient],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            AudioService.frequency.replaceAll(' FM', ''),
-            style: GoogleFonts.breeSerif(
-              fontSize: 48,
-              fontWeight: FontWeight.w700,
-              color: MohanaColors.primary,
-              height: 1,
+      child: Padding(
+        // Aire para que el texto no toque el borde del círculo.
+        padding: EdgeInsets.symmetric(horizontal: lado * 0.12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Cada texto se encoge antes que partirse: la frecuencia es una
+            // sola pieza, "91." sobre "2" no se lee.
+            _UnaLinea(
+              AudioService.frequency.replaceAll(' FM', ''),
+              GoogleFonts.breeSerif(
+                fontSize: _cuerpo,
+                fontWeight: FontWeight.w700,
+                color: MohanaColors.primary,
+                height: 1,
+              ),
             ),
-          ),
-          const SizedBox(height: MohanaSpacing.xs),
-          Text(
-            'FM STEREO',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: MohanaColors.onSurfaceVariant,
-              letterSpacing: 2,
+            const SizedBox(height: MohanaSpacing.xs),
+            _UnaLinea(
+              'FM STEREO',
+              GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: MohanaColors.onSurfaceVariant,
+                letterSpacing: 2,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+}
+
+/// Texto de una sola línea que se encoge si no cabe, en vez de partirse.
+class _UnaLinea extends StatelessWidget {
+  final String texto;
+  final TextStyle estilo;
+
+  const _UnaLinea(this.texto, this.estilo);
+
+  @override
+  Widget build(BuildContext context) {
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(texto, maxLines: 1, softWrap: false, style: estilo),
     );
   }
 }
@@ -211,6 +250,9 @@ class _PlayerControls extends StatelessWidget {
         GestureDetector(
           onTap: _shareApp,
           child: Container(
+            margin: const EdgeInsets.symmetric(
+              horizontal: MohanaSpacing.screenH,
+            ),
             padding: const EdgeInsets.symmetric(
               horizontal: MohanaSpacing.lg,
               vertical: MohanaSpacing.sm,
@@ -228,12 +270,18 @@ class _PlayerControls extends StatelessWidget {
                 const Icon(Icons.ios_share,
                     size: 18, color: MohanaColors.primary),
                 const SizedBox(width: MohanaSpacing.sm),
-                Text(
-                  'Compartir app',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: MohanaColors.primary,
+                // Flexible: con la letra al doble, la píldora se salía de la
+                // pantalla por la derecha.
+                Flexible(
+                  child: Text(
+                    'Compartir app',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: MohanaColors.primary,
+                    ),
                   ),
                 ),
               ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../config/drive_config.dart';
+import '../config/hygraph_config.dart';
 import '../config/theme.dart';
 import '../models/news_article.dart';
 import '../services/content_service.dart';
@@ -36,7 +36,7 @@ class _PostsScreenState extends State<PostsScreen> {
   }
 
   Future<void> _load({bool force = false}) async {
-    if (!DriveConfig.isConfigured) {
+    if (!HygraphConfig.isConfigured) {
       setState(() {
         _loading = false;
         _failed = true;

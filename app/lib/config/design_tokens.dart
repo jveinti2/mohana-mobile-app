@@ -80,7 +80,14 @@ class MohanaColors {
   static const info = Color(0xFF1976D2);
 
   // ── Status / Live ──────────────────────────────────────────
+  /// Punto del directo. Solo como mancha de color, nunca bajo texto.
   static const liveIndicator = Color(0xFFE91E63);
+
+  /// Paso más oscuro del mismo rosa, para cuando la píldora del directo lleva
+  /// texto encima: [liveIndicator] con blanco se queda en 3.97:1 y no llega al
+  /// 4.5:1 que pide AA. Este da 5.4:1.
+  static const liveIndicatorStrong = Color(0xFFC2185B);
+
   static const enVivoBadge = Color(0xFF7B2E88);
 
   // ── Misc UI ────────────────────────────────────────────────

@@ -28,7 +28,7 @@ class PodcastItem {
   });
 
   /// Etiqueta legible del número de episodios ("1 episodio" / "740 episodios").
-  /// Cae a [description] cuando el conteo no es numérico (podcasts de Drive).
+  /// Cae a [description] cuando el conteo no es numérico (el destacado del CMS).
   String get episodesLabel {
     final n = int.tryParse(episodes ?? '');
     if (n == null) return description;

@@ -1,22 +1,14 @@
 import 'dart:math';
-import '../config/drive_config.dart';
+
+import '../config/hygraph_config.dart';
 import '../models/news_article.dart';
 import '../models/podcast_item.dart';
-import 'drive_service.dart';
-import 'task_pool.dart';
+import 'hygraph_service.dart';
 
-/// Resultado del parseo de un archivo markdown con frontmatter.
-class _ParsedMarkdown {
-  final Map<String, String> frontmatter;
-  final String body;
-
-  const _ParsedMarkdown({required this.frontmatter, required this.body});
-}
-
-/// Contenido completo del home feed, cargado desde Google Drive.
+/// Contenido completo del home feed, cargado desde Hygraph.
 ///
 /// Los podcasts no salen de aquí: la fuente es iVoox ([IvooxService]). Solo se
-/// conserva [podcastDestacado] como respaldo para cuando iVoox no responde.
+/// conserva [podcastDestacado], que sí es editorial.
 class HomeContent {
   final NewsArticle? titular;
   final List<NewsArticle> articulos;
@@ -29,26 +21,63 @@ class HomeContent {
   });
 }
 
-/// Servicio de alto nivel que carga contenido desde Google Drive.
+/// Servicio de alto nivel que carga el contenido editorial desde Hygraph.
 ///
-/// Lee la estructura de carpetas en Drive y la convierte en modelos de la app.
+/// Frente a Drive, esto es **una sola petición**: allí había que listar la
+/// carpeta raíz, luego cada subcarpeta, luego bajar cada `contenido.md` — tres
+/// rondas y una tanda concurrente. Aquí GraphQL trae titular, artículos y
+/// podcast destacado de golpe, así que ni hace falta acotar concurrencia.
 class ContentService {
-  /// Peticiones simultáneas a Drive. Acorta la espera sin arriesgarse a que
-  /// Drive limite por ráfaga.
-  static const _driveConcurrency = 4;
+  ContentService._();
 
   /// Cuánto se reutiliza lo ya descargado. Evita que cambiar de pestaña o
-  /// volver atrás dispare otra vez todas las peticiones a Drive.
+  /// volver atrás dispare otra petición.
   static const _cacheTtl = Duration(minutes: 5);
+
+  /// Tope de artículos que se traen. Son los que la app llega a enseñar; el
+  /// resto sigue en el CMS pero no se descarga.
+  static const _maxArticulos = 40;
 
   static HomeContent? _cached;
   static DateTime? _cachedAt;
 
+  static const _query = r'''
+query ContenidoInicio($max: Int!, $anchoImagen: Int!, $anchoPortada: Int!) {
+  titulares: articulos(where: {titular: true}, orderBy: fecha_DESC, first: 1) {
+    ...campos
+  }
+  articulos(orderBy: fecha_DESC, first: $max) {
+    ...campos
+  }
+  podcastsDestacados(orderBy: updatedAt_DESC, first: 1) {
+    id
+    titulo
+    descripcion
+    url
+    portada {
+      url(transformation: {image: {resize: {width: $anchoPortada, fit: max}}})
+    }
+  }
+}
+
+fragment campos on Articulo {
+  id
+  titulo
+  fecha
+  categoria
+  autor
+  resumen
+  titular
+  cuerpo { markdown }
+  imagen {
+    url(transformation: {image: {resize: {width: $anchoImagen, fit: max}}})
+  }
+}
+''';
+
   /// Carga todo el contenido del home feed.
   static Future<HomeContent> loadHomeContent({bool forceRefresh = false}) async {
-    if (!DriveConfig.isConfigured) {
-      return const HomeContent();
-    }
+    if (!HygraphConfig.isConfigured) return const HomeContent();
 
     final cached = _cached;
     final at = _cachedAt;
@@ -59,161 +88,112 @@ class ContentService {
       return cached;
     }
 
-    // Descubrir carpetas sección dentro de la raíz
-    final rootFolders = await DriveService.listFolders(
-      DriveConfig.rootFolderId,
+    final data = await HygraphService.query(
+      _query,
+      variables: {
+        'max': _maxArticulos,
+        'anchoImagen': HygraphConfig.anchoImagen,
+        'anchoPortada': HygraphConfig.anchoPortada,
+      },
     );
-    final sectionMap = <String, String>{};
-    for (final folder in rootFolders) {
-      sectionMap[folder.name.toLowerCase()] = folder.id;
-    }
 
-    // Cargar cada sección en paralelo
-    final results = await Future.wait([
-      _loadTitular(sectionMap[DriveConfig.titularFolder]),
-      _loadArticulos(sectionMap[DriveConfig.articulosFolder]),
-      _loadPodcastDestacado(sectionMap[DriveConfig.podcastDestacadoFolder]),
-    ]);
+    final titularJson = _primero(data['titulares']);
+    final titular = titularJson == null ? null : _articulo(titularJson);
 
+    // El titular también viene en la lista general (es un artículo más, solo
+    // que marcado). Se quita de ahí para no enseñarlo dos veces.
+    final articulos = _lista(data['articulos'])
+        .map(_articulo)
+        .where((a) => a.id != titular?.id)
+        .toList();
+
+    final destacado = _primero(data['podcastsDestacados']);
     final content = HomeContent(
-      titular: results[0] as NewsArticle?,
-      articulos: results[1] as List<NewsArticle>,
-      podcastDestacado: results[2] as PodcastItem?,
+      titular: titular,
+      articulos: articulos,
+      podcastDestacado: destacado == null ? null : _podcast(destacado),
     );
     _cached = content;
     _cachedAt = DateTime.now();
     return content;
   }
 
-  /// Carga el artículo titular (carpeta con contenido.md + imagen).
-  static Future<NewsArticle?> _loadTitular(String? folderId) async {
-    if (folderId == null) return null;
-    return _loadSingleArticle(folderId, 'titular');
+  /// Olvida lo cacheado. Para el diagnóstico, que debe medir la red de verdad.
+  static void invalidate() {
+    _cached = null;
+    _cachedAt = null;
   }
 
-  /// Carga la lista de artículos (subcarpetas dentro de articulos/).
-  static Future<List<NewsArticle>> _loadArticulos(String? folderId) async {
-    if (folderId == null) return [];
+  // ─── Mapeo ─────────────────────────────────────────────────────
 
-    final subfolders = await DriveService.listFolders(folderId);
-
-    // En paralelo (con tope): cada artículo son 2-3 peticiones a Drive, y en
-    // serie la espera era la suma de todas.
-    final loaded = await pooled<DriveFile, NewsArticle?>(
-      subfolders,
-      _driveConcurrency,
-      (folder) => _loadSingleArticle(folder.id, folder.name),
-    );
-    final articles = loaded.whereType<NewsArticle>().toList();
-
-    // Ordenar por fecha (más reciente primero)
-    articles.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
-    return articles;
-  }
-
-  /// Carga un artículo desde una carpeta (contenido.md + imagen.*).
-  static Future<NewsArticle?> _loadSingleArticle(
-    String folderId,
-    String fallbackId,
-  ) async {
-    final files = await DriveService.listFiles(folderId);
-
-    // Buscar markdown y imagen
-    DriveFile? mdFile;
-    DriveFile? imgFile;
-    for (final file in files) {
-      if (file.isMarkdown) mdFile = file;
-      if (file.isImage) imgFile = file;
-    }
-
-    if (mdFile == null) return null;
-
-    final markdown = await DriveService.downloadText(mdFile.id);
-    final parsed = _parseMarkdown(markdown);
+  static NewsArticle _articulo(Map<String, dynamic> json) {
+    final cuerpo = (json['cuerpo'] as Map<String, dynamic>?)?['markdown'];
+    final body = (cuerpo as String?)?.trim() ?? '';
+    final resumen = (json['resumen'] as String?)?.trim();
 
     return NewsArticle(
-      id: fallbackId,
-      title: parsed.frontmatter['titulo'] ?? fallbackId,
-      summary: _extractSummary(parsed.body),
-      body: parsed.body,
-      imageUrl: imgFile != null ? DriveService.imageUrl(imgFile.id) : '',
-      category: parsed.frontmatter['categoria'] ?? 'General',
-      author: parsed.frontmatter['autor'] ?? 'La Mohana',
-      publishedAt: _parseDate(parsed.frontmatter['fecha']),
+      id: json['id'] as String? ?? '',
+      title: (json['titulo'] as String?)?.trim() ?? 'Sin título',
+      // El resumen es opcional en el panel: si nadie lo escribe, se saca del
+      // cuerpo como se hacía con los archivos de Drive.
+      summary: resumen != null && resumen.isNotEmpty
+          ? resumen
+          : _extractSummary(body),
+      body: body,
+      imageUrl: _url(json['imagen']),
+      category: categoriaVisible(json['categoria'] as String?),
+      author: (json['autor'] as String?)?.trim().isNotEmpty == true
+          ? (json['autor'] as String).trim()
+          : 'La Mohana',
+      publishedAt: _fecha(json['fecha'] as String?),
     );
   }
 
-  /// Carga el podcast destacado (carpeta con contenido.md + portada.*).
-  static Future<PodcastItem?> _loadPodcastDestacado(String? folderId) async {
-    if (folderId == null) return null;
-    return _loadSinglePodcast(folderId, 'podcast_destacado');
+  static PodcastItem _podcast(Map<String, dynamic> json) => PodcastItem(
+    id: json['id'] as String? ?? 'podcast_destacado',
+    title: (json['titulo'] as String?)?.trim() ?? '',
+    description: (json['descripcion'] as String?)?.trim() ?? '',
+    body: '',
+    imageUrl: _url(json['portada']),
+    audioUrl: json['url'] as String?,
+  );
+
+  static String _url(Object? asset) =>
+      (asset as Map<String, dynamic>?)?['url'] as String? ?? '';
+
+  /// Hygraph devuelve el identificador de la enumeración (`medio_ambiente`),
+  /// no lo que se ve en el panel. La app necesita el nombre legible: es lo que
+  /// se pinta en la etiqueta y con lo que `MohanaCategoryColors` elige color.
+  static const _categorias = <String, String>{
+    'impacto_social': 'Impacto Social',
+    'cultura': 'Cultura',
+    'salud': 'Salud',
+    'medio_ambiente': 'Medio Ambiente',
+    'musica': 'Música',
+    'comunidad': 'Comunidad',
+    'educacion': 'Educación',
+    'infraestructura': 'Infraestructura',
+  };
+
+  /// Nombre visible de una categoría. Si en el CMS añaden una que la app no
+  /// conoce, se enseña con guiones bajos convertidos en espacios en vez de
+  /// desaparecer.
+  static String categoriaVisible(String? apiId) {
+    if (apiId == null || apiId.isEmpty) return 'General';
+    final conocida = _categorias[apiId];
+    if (conocida != null) return conocida;
+    return apiId
+        .split('_')
+        .map((p) => p.isEmpty ? p : '${p[0].toUpperCase()}${p.substring(1)}')
+        .join(' ');
   }
 
-  /// Carga un podcast desde una carpeta (contenido.md + portada.*).
-  static Future<PodcastItem?> _loadSinglePodcast(
-    String folderId,
-    String fallbackId,
-  ) async {
-    final files = await DriveService.listFiles(folderId);
+  static List<Map<String, dynamic>> _lista(Object? raw) =>
+      (raw as List?)?.whereType<Map<String, dynamic>>().toList() ?? const [];
 
-    DriveFile? mdFile;
-    DriveFile? imgFile;
-    for (final file in files) {
-      if (file.isMarkdown) mdFile = file;
-      if (file.isImage) imgFile = file;
-    }
-
-    if (mdFile == null) return null;
-
-    final markdown = await DriveService.downloadText(mdFile.id);
-    final parsed = _parseMarkdown(markdown);
-
-    return PodcastItem(
-      id: fallbackId,
-      title: parsed.frontmatter['titulo'] ?? fallbackId,
-      description: parsed.frontmatter['descripcion'] ?? '',
-      body: parsed.body,
-      imageUrl: imgFile != null ? DriveService.imageUrl(imgFile.id) : '',
-      audioUrl: parsed.frontmatter['url'],
-      episodes: parsed.frontmatter['episodios'],
-    );
-  }
-
-  /// Parsea un archivo markdown con frontmatter YAML.
-  ///
-  /// Formato esperado:
-  /// ```
-  /// ---
-  /// titulo: Mi Título
-  /// fecha: 2026-05-20
-  /// ---
-  /// Cuerpo del contenido aquí...
-  /// ```
-  static _ParsedMarkdown _parseMarkdown(String content) {
-    final trimmed = content.trim();
-    final frontmatter = <String, String>{};
-    var body = trimmed;
-
-    if (trimmed.startsWith('---')) {
-      final endIndex = trimmed.indexOf('---', 3);
-      if (endIndex != -1) {
-        final yamlBlock = trimmed.substring(3, endIndex).trim();
-        body = trimmed.substring(endIndex + 3).trim();
-
-        for (final line in yamlBlock.split('\n')) {
-          final colonIndex = line.indexOf(':');
-          if (colonIndex != -1) {
-            final key = line.substring(0, colonIndex).trim().toLowerCase();
-            final value = line.substring(colonIndex + 1).trim();
-            if (key.isNotEmpty && value.isNotEmpty) {
-              frontmatter[key] = value;
-            }
-          }
-        }
-      }
-    }
-
-    return _ParsedMarkdown(frontmatter: frontmatter, body: body);
+  static Map<String, dynamic>? _primero(Object? raw) {
+    final lista = _lista(raw);
+    return lista.isEmpty ? null : lista.first;
   }
 
   /// Extrae las primeras ~150 caracteres como resumen.
@@ -225,17 +205,9 @@ class ContentService {
     return end < clean.length ? '$summary...' : summary;
   }
 
-  /// Parsea una fecha en formato YYYY-MM-DD.
-  static DateTime _parseDate(String? dateStr) {
-    if (dateStr == null || dateStr.isEmpty) return DateTime.now();
-    final parts = dateStr.split('-');
-    if (parts.length == 3) {
-      return DateTime(
-        int.tryParse(parts[0]) ?? 2026,
-        int.tryParse(parts[1]) ?? 1,
-        int.tryParse(parts[2]) ?? 1,
-      );
-    }
-    return DateTime.now();
+  /// Parsea una fecha en formato YYYY-MM-DD, que es lo que da el campo Date.
+  static DateTime _fecha(String? raw) {
+    if (raw == null || raw.isEmpty) return DateTime.now();
+    return DateTime.tryParse(raw) ?? DateTime.now();
   }
 }

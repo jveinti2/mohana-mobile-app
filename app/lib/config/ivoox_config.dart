@@ -52,6 +52,19 @@ class IvooxConfig {
   /// Programas por página en el listado de la emisora.
   static const catalogPageSize = 12;
 
+  /// Redimensionador de imágenes de iVoox. Acepta la imagen original en
+  /// `url=` y devuelve una copia del tamaño pedido.
+  static const coverResizer = 'https://img-static.ivoox.com/index.php';
+
+  /// Lado en píxeles al que se piden todas las carátulas.
+  ///
+  /// Un solo tamaño para la cuadrícula, la fila de episodio, el reproductor y
+  /// la notificación, y es deliberado: así las cuatro piden **la misma URL**,
+  /// de modo que la portada ya está en caché cuando se abre el reproductor y
+  /// aparece al instante. Los originales de iVoox son de 1400×1400 y llegan a
+  /// 1,2 MB; a 480 px el mismo archivo pesa entre 21 y 89 KB.
+  static const coverSize = 480;
+
   /// Página del catálogo de programas de la emisora ([page] empieza en 1).
   static String catalogUrl(int page) =>
       'https://www.ivoox.com/escuchar-programas-${stationSlug}_al_${stationId}_$page.html?show=programs';

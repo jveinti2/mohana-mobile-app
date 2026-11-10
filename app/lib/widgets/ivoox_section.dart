@@ -28,7 +28,7 @@ class IvooxSection extends StatelessWidget {
 
         // Horizontal scroll of podcast cards
         SizedBox(
-          height: 150,
+          height: _PodcastProgramCard.heightFor(context),
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(
@@ -119,52 +119,79 @@ class IvooxSectionHeader extends StatelessWidget {
   }
 }
 
+/// Tarjeta de un programa en la fila del home.
+///
+/// La carátula es lo único que hace reconocible un programa de un vistazo, así
+/// que manda: ocupa la tarjeta entera en vez de ir a 36 px dentro de una caja
+/// blanca. Al quitar la caja, la tarjeta queda igual que la del carrusel de la
+/// biblioteca: una sola forma para el mismo contenido en dos sitios.
 class _PodcastProgramCard extends StatelessWidget {
   final PodcastItem podcast;
   final VoidCallback? onTap;
 
   const _PodcastProgramCard({required this.podcast, this.onTap});
 
+  static const _cover = 130.0;
+  static const _titleSize = 12.0;
+  static const _subtitleSize = 10.0;
+
+  /// Alto de la fila: carátula más el bloque de texto de dos líneas.
+  ///
+  /// Se calcula con el tamaño de letra real del sistema, igual que en
+  /// [ProgramGridCard]: como constante se quedaba corto —hasta con la letra de
+  /// fábrica— y el conteo de episodios se salía de la tarjeta.
+  static double heightFor(BuildContext context) {
+    final scaler = MediaQuery.textScalerOf(context);
+    return _cover +
+        MohanaSpacing.sm +
+        scaler.scale(_titleSize) * 1.25 * 2 +
+        2 +
+        scaler.scale(_subtitleSize) * 1.4 +
+        // Un pelo de holgura: el alto de línea real de una tipografía no cae
+        // nunca exactamente en el múltiplo que se calcula aquí.
+        4;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        width: 140,
-        padding: const EdgeInsets.all(MohanaSpacing.md),
-        decoration: BoxDecoration(
-          color: MohanaColors.surface,
-          borderRadius: MohanaRadius.lgAll,
-          boxShadow: [MohanaShadows.tonalCard],
-        ),
+      child: SizedBox(
+        width: _cover,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Cover image or icon
-            MohanaCover.square(
-              url: podcast.imageUrl,
-              size: 36,
-              borderRadius: MohanaRadius.smAll,
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: MohanaRadius.mdAll,
+                boxShadow: [MohanaShadows.tonalCard],
+              ),
+              child: MohanaCover.square(
+                url: podcast.imageUrl,
+                size: _cover,
+                borderRadius: MohanaRadius.mdAll,
+              ),
             ),
-            const Spacer(),
+            const SizedBox(height: MohanaSpacing.sm),
             Text(
               podcast.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.poppins(
-                fontSize: 13,
+                fontSize: _titleSize,
                 fontWeight: FontWeight.w700,
                 color: MohanaColors.onSurface,
-                height: 1.2,
+                height: 1.25,
               ),
             ),
-            const SizedBox(height: MohanaSpacing.xxs),
+            const SizedBox(height: 2),
             Text(
               podcast.episodesLabel,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.poppins(
-                fontSize: 11,
+                fontSize: _subtitleSize,
+                fontWeight: FontWeight.w500,
                 color: MohanaColors.onSurfaceVariant,
               ),
             ),

@@ -6,6 +6,8 @@ import '../models/podcast_episode.dart';
 import '../models/podcast_item.dart';
 import '../services/audio_service.dart';
 import '../services/ivoox_service.dart';
+import '../services/resume_store.dart';
+import '../utils/dates.dart';
 import '../widgets/audio_player_bar.dart';
 import '../widgets/entrance.dart';
 import '../widgets/feed_skeleton.dart';
@@ -42,6 +44,12 @@ class _PodcastsLibraryScreenState extends State<PodcastsLibraryScreen> {
 
   late List<IvooxProgramRef> _catalog;
 
+  final _searchController = TextEditingController();
+
+  /// Texto del buscador. Con 27 programas de nombres largos, recorrer la
+  /// cuadrícula a ciegas era la única forma de encontrar algo.
+  String _query = '';
+
   /// Programas cuyo feed ya se descargó, por feedId.
   final Map<String, PodcastItem> _loaded = {};
   final Set<String> _requested = {};
@@ -54,6 +62,20 @@ class _PodcastsLibraryScreenState extends State<PodcastsLibraryScreen> {
     super.initState();
     _catalog = const [];
     _loadCatalog();
+    // El avance del episodio se anota mientras suena: al pausar o cambiar de
+    // pista hay que repintar la tarjeta de "seguir escuchando".
+    AudioService().addListener(_onAudioChanged);
+  }
+
+  @override
+  void dispose() {
+    AudioService().removeListener(_onAudioChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onAudioChanged() {
+    if (mounted) setState(() {});
   }
 
   /// Carga el catálogo cuando la pantalla se abre por su cuenta. La caché hace
@@ -74,7 +96,28 @@ class _PodcastsLibraryScreenState extends State<PodcastsLibraryScreen> {
     await _fetchVisibleFeeds();
   }
 
-  List<IvooxProgramRef> get _refs => _catalog;
+  /// Programas que se muestran: todos, o los que casan con la búsqueda.
+  List<IvooxProgramRef> get _refs {
+    if (_query.trim().isEmpty) return _catalog;
+    final q = _plano(_query);
+    return _catalog.where((r) => _plano(r.name).contains(q)).toList();
+  }
+
+  bool get _buscando => _query.trim().isNotEmpty;
+
+  /// Minúsculas y sin tildes: nadie escribe "Zona Púrpura" con tilde en el
+  /// buscador de un móvil.
+  static String _plano(String input) {
+    const acentos = 'áàäâãéèëêíìïîóòöôõúùüûñç';
+    const planos = 'aaaaaeeeeiiiiooooouuuunc';
+    final buffer = StringBuffer();
+    for (final rune in input.toLowerCase().runes) {
+      final char = String.fromCharCode(rune);
+      final i = acentos.indexOf(char);
+      buffer.write(i == -1 ? char : planos[i]);
+    }
+    return buffer.toString();
+  }
 
   bool get _hasMore => _visible < _refs.length;
 
@@ -207,9 +250,39 @@ class _PodcastsLibraryScreenState extends State<PodcastsLibraryScreen> {
     ).push(MaterialPageRoute(builder: (_) => const EpisodePlayerScreen()));
   }
 
+  /// Retoma el episodio a medias. Si su programa ya está cargado se pasa la
+  /// cola entera, para no perder el anterior/siguiente por venir de aquí.
+  void _resumeEntry(ResumeEntry entry) {
+    PodcastItem? program;
+    for (final item in _loaded.values) {
+      if (item.title == entry.program) {
+        program = item;
+        break;
+      }
+    }
+    final queue = program?.episodeList ?? const <PodcastEpisode>[];
+
+    AudioService().playEpisode(
+      entry.audioUrl,
+      title: entry.title,
+      subtitle: entry.program,
+      // La marca de avance puede venir de antes de que se guardara la
+      // carátula; en ese caso se toma la del programa si ya está cargado.
+      imageUrl: entry.imageUrl.isNotEmpty
+          ? entry.imageUrl
+          : (program?.imageUrl ?? ''),
+      queue: queue,
+      queueIndex: queue.indexWhere((e) => e.audioUrl == entry.audioUrl),
+    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const EpisodePlayerScreen()));
+  }
+
   @override
   Widget build(BuildContext context) {
     final featured = _refs.isNotEmpty ? _refs.first : null;
+    final resume = ResumeStore.latest;
     final loadingFirstPage = _loadingCatalog && _refs.isEmpty;
     final recents = _recents;
     final visibleRefs = _refs.take(_visible).toList();
@@ -249,8 +322,18 @@ class _PodcastsLibraryScreenState extends State<PodcastsLibraryScreen> {
                 child: SizedBox(height: MohanaSpacing.sm),
               ),
 
+              SliverToBoxAdapter(
+                child: _SearchField(
+                  controller: _searchController,
+                  onChanged: (value) => setState(() => _query = value),
+                ),
+              ),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: MohanaSpacing.lg),
+              ),
+
               // Primera carga del catálogo: esqueleto en lugar de vacío.
-              if (loadingFirstPage)
+              if (loadingFirstPage && !_buscando)
                 const SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.only(top: MohanaSpacing.base),
@@ -258,8 +341,35 @@ class _PodcastsLibraryScreenState extends State<PodcastsLibraryScreen> {
                   ),
                 ),
 
+              // Seguir escuchando ocupa el sitio del destacado cuando hay un
+              // episodio a medias: quien vuelve a la app viene a terminarlo.
+              if (!_buscando && resume != null) ...[
+                const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MohanaSpacing.base,
+                    ),
+                    child: SectionEyebrow('Seguir escuchando'),
+                  ),
+                ),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: MohanaSpacing.md),
+                ),
+                SliverToBoxAdapter(
+                  child: StaggeredEntrance(
+                    index: 0,
+                    child: _ResumeCard(
+                      entry: resume,
+                      onTap: () => _resumeEntry(resume),
+                    ),
+                  ),
+                ),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: MohanaSpacing.xl),
+                ),
+              ]
               // Destacado
-              if (featured != null) ...[
+              else if (!_buscando && featured != null) ...[
                 const SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.symmetric(
@@ -304,6 +414,7 @@ class _PodcastsLibraryScreenState extends State<PodcastsLibraryScreen> {
               ],
 
               // Episodios recientes (carrusel)
+              if (!_buscando) ...[
               const SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: MohanaSpacing.base),
@@ -342,6 +453,7 @@ class _PodcastsLibraryScreenState extends State<PodcastsLibraryScreen> {
               const SliverToBoxAdapter(
                 child: SizedBox(height: MohanaSpacing.xl),
               ),
+              ],
 
               // Todos los programas (grid)
               SliverToBoxAdapter(
@@ -351,8 +463,10 @@ class _PodcastsLibraryScreenState extends State<PodcastsLibraryScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Expanded(
-                        child: SectionEyebrow('Todos los programas'),
+                      Expanded(
+                        child: SectionEyebrow(
+                          _buscando ? 'Resultados' : 'Todos los programas',
+                        ),
                       ),
                       Text(
                         '${_refs.length}',
@@ -369,6 +483,8 @@ class _PodcastsLibraryScreenState extends State<PodcastsLibraryScreen> {
               const SliverToBoxAdapter(
                 child: SizedBox(height: MohanaSpacing.md),
               ),
+              if (_buscando && _refs.isEmpty)
+                SliverToBoxAdapter(child: _SinResultados(query: _query)),
               SliverPadding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: MohanaSpacing.base,
@@ -410,6 +526,186 @@ class _PodcastsLibraryScreenState extends State<PodcastsLibraryScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Buscador del catálogo.
+///
+/// Va en blanco y no en el relleno gris del tema: `surfaceContainerLow` sobre
+/// el lila del fondo tonal se ve sucio.
+class _SearchField extends StatelessWidget {
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+
+  const _SearchField({required this.controller, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: MohanaSpacing.base),
+      child: TextField(
+        controller: controller,
+        onChanged: onChanged,
+        textInputAction: TextInputAction.search,
+        style: GoogleFonts.poppins(
+          fontSize: 14,
+          color: MohanaColors.onSurface,
+        ),
+        decoration: InputDecoration(
+          fillColor: MohanaColors.surface,
+          hintText: 'Buscar programa',
+          prefixIcon: const Icon(Icons.search_rounded, size: 20),
+          suffixIcon: controller.text.isEmpty
+              ? null
+              : IconButton(
+                  icon: const Icon(Icons.close_rounded, size: 20),
+                  tooltip: 'Limpiar búsqueda',
+                  onPressed: () {
+                    controller.clear();
+                    onChanged('');
+                  },
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Episodio a medias, listo para retomar donde se dejó.
+class _ResumeCard extends StatelessWidget {
+  final ResumeEntry entry;
+  final VoidCallback onTap;
+
+  const _ResumeCard({required this.entry, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return PressableScale(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: MohanaSpacing.base),
+        padding: const EdgeInsets.all(MohanaSpacing.md),
+        decoration: MohanaDecorations.tonalCard,
+        child: Row(
+          children: [
+            MohanaCover.square(
+              url: entry.imageUrl,
+              size: 56,
+              borderRadius: MohanaRadius.mdAll,
+            ),
+            const SizedBox(width: MohanaSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (entry.program.isNotEmpty) ...[
+                    Text(
+                      entry.program,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: MohanaColors.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: MohanaSpacing.xs),
+                  ],
+                  Text(
+                    entry.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.breeSerif(
+                      fontSize: 14,
+                      color: MohanaColors.onSurface,
+                      height: 1.25,
+                    ),
+                  ),
+                  const SizedBox(height: MohanaSpacing.sm),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(2),
+                          child: LinearProgressIndicator(
+                            value: entry.fraction,
+                            minHeight: 3,
+                            backgroundColor: MohanaColors.outlineVariant
+                                .withValues(alpha: 0.45),
+                            valueColor: const AlwaysStoppedAnimation(
+                              MohanaColors.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: MohanaSpacing.sm),
+                      Text(
+                        entry.remainingLabel,
+                        style: GoogleFonts.poppins(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: MohanaColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: MohanaSpacing.md),
+            Container(
+              width: 38,
+              height: 38,
+              decoration: const BoxDecoration(
+                gradient: MohanaGradients.brand,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.play_arrow_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Búsqueda sin coincidencias. Dice qué se buscó, para que se vea la errata.
+class _SinResultados extends StatelessWidget {
+  final String query;
+
+  const _SinResultados({required this.query});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: MohanaSpacing.base,
+        vertical: MohanaSpacing.xl,
+      ),
+      child: Column(
+        children: [
+          const Icon(
+            Icons.search_off_rounded,
+            size: 40,
+            color: MohanaColors.onSurfaceVariant,
+          ),
+          const SizedBox(height: MohanaSpacing.md),
+          Text(
+            'Ningún programa se llama «$query»',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: MohanaColors.onSurfaceVariant,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -559,6 +855,15 @@ class _RecentCard extends StatelessWidget {
 
   const _RecentCard({required this.entry, required this.onTap});
 
+  /// "21 may · 48 min", con lo que haya: el feed no siempre trae las dos.
+  static String _meta(_RecentEntry entry) {
+    final partes = <String>[
+      if (entry.episode.date != null) fechaRelativa(entry.episode.date!),
+      if (entry.episode.duration != null) entry.episode.duration!,
+    ];
+    return partes.isEmpty ? 'Nuevo episodio' : partes.join(' · ');
+  }
+
   @override
   Widget build(BuildContext context) {
     return PressableScale(
@@ -584,8 +889,10 @@ class _RecentCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: MohanaSpacing.sm),
+            // La sección es de episodios, así que manda el título del
+            // episodio; el programa ya se reconoce por la carátula.
             Text(
-              entry.program.title,
+              entry.episode.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.poppins(
@@ -597,11 +904,12 @@ class _RecentCard extends StatelessWidget {
             ),
             const SizedBox(height: MohanaSpacing.xxs),
             Text(
-              entry.episode.duration ?? 'Nuevo episodio',
+              _meta(entry),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.poppins(
                 fontSize: 10,
+                fontWeight: FontWeight.w500,
                 color: MohanaColors.onSurfaceVariant,
               ),
             ),

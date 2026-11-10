@@ -334,7 +334,7 @@ class IvooxService {
         IvooxProgramRef(
           _unescapeHtml(name).trim(),
           id,
-          coverUrl: _coverUrl(cover),
+          coverUrl: _resizedCover(cover),
         ),
       );
     }
@@ -345,13 +345,29 @@ class IvooxService {
     );
   }
 
-  /// La miniatura del listado viene a 77 px; se le pide al redimensionador de
-  /// iVoox una versión utilizable como carátula.
-  static String _coverUrl(String? raw) {
+  /// Pide la carátula al redimensionador de iVoox a [IvooxConfig.coverSize].
+  ///
+  /// Las carátulas llegan en dos formas y antes se trataban distinto, que era
+  /// el fallo: el listado la trae ya envuelta en el redimensionador al tamaño
+  /// de la miniatura, y el feed la trae **cruda** —el original de 1400×1400,
+  /// hasta 1,2 MB—. Bajarse ese original para pintar una fila de 48 dp es lo
+  /// que hacía que la portada tardara segundos en aparecer y que mientras
+  /// tanto se viera el respaldo de marca.
+  ///
+  /// Desenvuelve y vuelve a envolver en vez de reescribir el tamaño en el
+  /// sitio, así que es idempotente y no depende de qué medida traiga iVoox
+  /// —hoy sirve el listado a 77 px, pero usa 141 en otras partes de la misma
+  /// página y puede cambiarlo sin avisar—.
+  static String _resizedCover(String? raw) {
     if (raw == null || raw.isEmpty) return '';
-    final url = _unescapeHtml(raw).trim();
+    var url = _unescapeHtml(raw).trim();
     if (!url.startsWith('http')) return '';
-    return url.replaceAll('w=77&h=77', 'w=320&h=320');
+
+    final envuelta = RegExp(r'[?&]url=(https?://.+)$').firstMatch(url);
+    if (envuelta != null) url = envuelta.group(1)!;
+
+    final lado = IvooxConfig.coverSize;
+    return '${IvooxConfig.coverResizer}?w=$lado&h=$lado&url=$url';
   }
 
   /// Deshace las entidades HTML. Se aplica dos veces porque iVoox las
@@ -418,7 +434,7 @@ class IvooxService {
       if (channel == null) return null;
 
       final channelTitle = _childText(channel, 'title') ?? job.fallbackName;
-      var channelImage = _imageUrl(channel);
+      var channelImage = _resizedCover(_imageUrl(channel));
       if (channelImage.isEmpty) channelImage = job.fallbackCover;
 
       final episodes = <PodcastEpisode>[];
@@ -429,7 +445,7 @@ class IvooxService {
             ?.getAttribute('url');
         if (audioUrl == null || audioUrl.isEmpty) continue;
 
-        final itemImage = _imageUrl(item);
+        final itemImage = _resizedCover(_imageUrl(item));
         episodes.add(
           PodcastEpisode(
             title: _childText(item, 'title') ?? 'Episodio',

@@ -47,13 +47,20 @@ class PodcastCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: MohanaSpacing.xs),
-                      Text(
-                        'PODCAST DESTACADO',
-                        style: GoogleFonts.poppins(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: MohanaCategoryColors.podcastNuevo,
-                          letterSpacing: 0.5,
+                      // Flexible: la etiqueta es larga y, junto a la carátula
+                      // de 56, no cabía en un teléfono estrecho ni con la
+                      // letra de fábrica.
+                      Flexible(
+                        child: Text(
+                          'PODCAST DESTACADO',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: MohanaCategoryColors.podcastNuevo,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ),
                     ],

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 
 /// Esqueleto del feed con efecto shimmer, mostrado mientras carga el contenido
-/// desde Drive. Reemplaza el spinner genérico por una previsualización de la
+/// desde el CMS. Reemplaza el spinner genérico por una previsualización de la
 /// estructura real — sensación de carga más rápida y pulida.
 class FeedSkeleton extends StatelessWidget {
   const FeedSkeleton({super.key});
@@ -12,8 +12,11 @@ class FeedSkeleton extends StatelessWidget {
     return _Shimmer(
       child: ListView(
         physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.only(top: MohanaSpacing.base),
+        padding: const EdgeInsets.only(top: MohanaSpacing.md),
         children: [
+          // En el aire
+          const _Box(height: 84, radius: MohanaRadius.lg, marginH: true),
+          const SizedBox(height: MohanaSpacing.xl),
           // Artículo destacado
           const _Box(height: 280, radius: MohanaRadius.lg, marginH: true),
           const SizedBox(height: MohanaSpacing.xl),
@@ -31,7 +34,7 @@ class FeedSkeleton extends StatelessWidget {
           const SizedBox(height: MohanaSpacing.base),
           // Cards de podcast (horizontal)
           SizedBox(
-            height: 150,
+            height: 184,
             child: ListView(
               scrollDirection: Axis.horizontal,
               physics: const NeverScrollableScrollPhysics(),
@@ -39,11 +42,11 @@ class FeedSkeleton extends StatelessWidget {
                 horizontal: MohanaSpacing.screenH,
               ),
               children: const [
-                _Box(width: 140, height: 150, radius: MohanaRadius.lg),
+                _Box(width: 130, height: 184, radius: MohanaRadius.lg),
                 SizedBox(width: MohanaSpacing.md),
-                _Box(width: 140, height: 150, radius: MohanaRadius.lg),
+                _Box(width: 130, height: 184, radius: MohanaRadius.lg),
                 SizedBox(width: MohanaSpacing.md),
-                _Box(width: 140, height: 150, radius: MohanaRadius.lg),
+                _Box(width: 130, height: 184, radius: MohanaRadius.lg),
               ],
             ),
           ),
@@ -63,8 +66,8 @@ class PodcastRowSkeleton extends StatelessWidget {
 
   const PodcastRowSkeleton({
     super.key,
-    this.height = 150,
-    this.cardWidth = 140,
+    this.height = 184,
+    this.cardWidth = 130,
     this.count = 3,
   });
 

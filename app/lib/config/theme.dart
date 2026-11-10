@@ -399,6 +399,8 @@ class MohanaTheme {
       decoration: MohanaDecorations.categoryTag(category),
       child: Text(
         category.toUpperCase(),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: GoogleFonts.poppins(
           fontSize: 10,
           fontWeight: FontWeight.w700,

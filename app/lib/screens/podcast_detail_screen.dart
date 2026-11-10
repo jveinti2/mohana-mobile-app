@@ -74,7 +74,7 @@ class _PodcastDetailScreenState extends State<PodcastDetailScreen> {
     }
   }
 
-  /// Solo los programas de iVoox tienen feed; los de Drive no.
+  /// Solo los programas de iVoox tienen feed; el destacado del CMS no.
   bool get _hasFeed => int.tryParse(_program.id) != null;
 
   /// Los episodios se descargan al abrir el programa, no en el arranque de la
@@ -217,13 +217,22 @@ class _PodcastDetailScreenState extends State<PodcastDetailScreen> {
                     child: Row(
                       children: [
                         const Expanded(child: SectionEyebrow('Episodios')),
+                        // `episodesLabel` cae a la descripción del programa
+                        // cuando el conteo no es un número (el destacado del
+                        // CMS): puede ser una frase entera, así que se recorta
+                        // en vez de empujar la fila fuera de la pantalla.
                         if (_episodes.isNotEmpty)
-                          Text(
-                            _program.episodesLabel,
-                            style: GoogleFonts.poppins(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: MohanaColors.onSurfaceVariant,
+                          Flexible(
+                            child: Text(
+                              _program.episodesLabel,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.end,
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: MohanaColors.onSurfaceVariant,
+                              ),
                             ),
                           ),
                       ],
@@ -452,11 +461,16 @@ class _EpisodeTile extends StatelessWidget {
     required this.onTap,
   });
 
+  /// Lado de la carátula. No crece con la escala de letra a propósito: es una
+  /// imagen, no texto, y dejarla escalar desencuadraría la fila.
+  static const _coverSide = 48.0;
+
   @override
   Widget build(BuildContext context) {
     // Por URL, no por titulo: los titulos se repiten dentro de un programa.
     final isCurrent = audio.currentEpisodeUrl == episode.audioUrl;
     final isPlaying = isCurrent && audio.isPlaying;
+    final description = episode.description.trim();
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -484,31 +498,15 @@ class _EpisodeTile extends StatelessWidget {
               vertical: MohanaSpacing.md,
             ),
             child: Row(
+              // Arriba, no centrado: con descripción la columna de texto
+              // crece y la carátula tiene que quedarse a la altura del título.
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    gradient: isCurrent ? MohanaGradients.primaryButton : null,
-                    color: isCurrent ? null : MohanaColors.surface,
-                    shape: BoxShape.circle,
-                    boxShadow: isCurrent
-                        ? null
-                        : [
-                            BoxShadow(
-                              color: MohanaColors.tertiary.withValues(
-                                alpha: 0.18,
-                              ),
-                              offset: const Offset(0, 2),
-                              blurRadius: 8,
-                            ),
-                          ],
-                  ),
-                  child: Icon(
-                    isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                    color: isCurrent ? Colors.white : MohanaColors.primary,
-                    size: 24,
-                  ),
+                _EpisodeThumb(
+                  url: episode.imageUrl,
+                  side: _coverSide,
+                  isCurrent: isCurrent,
+                  isPlaying: isPlaying,
                 ),
                 const SizedBox(width: MohanaSpacing.md),
                 Expanded(
@@ -536,6 +534,22 @@ class _EpisodeTile extends StatelessWidget {
                           color: MohanaColors.onSurfaceVariant,
                         ),
                       ),
+                      // La descripción sale tal como la escribe la emisora en
+                      // iVoox, sin filtrar: hoy muchas repiten la fecha, y eso
+                      // se arregla en iVoox, no escondiéndolo aquí.
+                      if (description.isNotEmpty) ...[
+                        const SizedBox(height: MohanaSpacing.xxs),
+                        Text(
+                          description,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            color: MohanaColors.onSurfaceVariant,
+                            height: 1.35,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -554,5 +568,57 @@ class _EpisodeTile extends StatelessWidget {
     final dur = episode.duration ?? '';
     if (date.isNotEmpty && dur.isNotEmpty) return '$date · $dur';
     return date.isNotEmpty ? date : dur;
+  }
+}
+
+/// Carátula del episodio en la fila de la lista.
+///
+/// Antes aquí había solo un círculo con el icono de play, y era la queja: la
+/// portada no se veía hasta abrir el reproductor. Ahora manda la imagen, y el
+/// play/pausa aparece superpuesto únicamente en el episodio en curso — en los
+/// demás sobra, porque toda la fila ya es pulsable.
+class _EpisodeThumb extends StatelessWidget {
+  final String url;
+  final double side;
+  final bool isCurrent;
+  final bool isPlaying;
+
+  const _EpisodeThumb({
+    required this.url,
+    required this.side,
+    required this.isCurrent,
+    required this.isPlaying,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: side,
+      height: side,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          MohanaCover.square(
+            url: url,
+            size: side,
+            borderRadius: MohanaRadius.mdAll,
+          ),
+          if (isCurrent)
+            DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: MohanaRadius.mdAll,
+                color: MohanaColors.primary.withValues(alpha: 0.62),
+              ),
+              child: Center(
+                child: Icon(
+                  isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }

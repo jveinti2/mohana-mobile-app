@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/theme.dart';
-import 'mohana_cover.dart';
 import '../models/news_article.dart';
+import '../utils/dates.dart';
+import 'mohana_cover.dart';
 
 class ArticleListCard extends StatelessWidget {
   final NewsArticle article;
@@ -34,16 +35,43 @@ class ArticleListCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  article.category.toUpperCase(),
-                  style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: categoryColor,
-                    letterSpacing: 0.5,
-                  ),
+                // Categoría y fecha en la misma línea. La fecha estaba en el
+                // modelo desde el principio pero no se veía: una noticia de
+                // hace ocho meses se leía igual que la de ayer.
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        article.category.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: categoryColor,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    const _Separador(),
+                    // También flexible: con la letra ampliada, una fecha
+                    // larga ("14 de marzo de 2025") empujaba la fila fuera de
+                    // la tarjeta en un teléfono estrecho.
+                    Flexible(
+                      child: Text(
+                        fechaRelativa(article.publishedAt),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: MohanaColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: MohanaSpacing.xs),
+                const SizedBox(height: MohanaSpacing.xs + 2),
                 Text(
                   article.title,
                   maxLines: 2,
@@ -55,7 +83,9 @@ class ArticleListCard extends StatelessWidget {
                     height: 1.3,
                   ),
                 ),
-                const SizedBox(height: MohanaSpacing.xs),
+                const SizedBox(height: MohanaSpacing.xs + 2),
+                // Sin "LEER MÁS": se repetía en cada fila sin decir nada, y la
+                // tarjeta entera ya lleva al artículo.
                 Text(
                   article.summary,
                   maxLines: 2,
@@ -67,21 +97,31 @@ class ArticleListCard extends StatelessWidget {
                     height: 1.4,
                   ),
                 ),
-                const SizedBox(height: MohanaSpacing.sm),
-                Text(
-                  'LEER MÁS  →',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: MohanaColors.primary,
-                  ),
-                ),
               ],
             ),
           ),
         ],
       ),
     ),
+    );
+  }
+}
+
+/// Punto de separación entre categoría y fecha. Sustituye a la barra vertical:
+/// una línea de 1 px partiría la regla de no seccionar con trazos.
+class _Separador extends StatelessWidget {
+  const _Separador();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 3,
+      height: 3,
+      margin: const EdgeInsets.symmetric(horizontal: MohanaSpacing.xs + 2),
+      decoration: const BoxDecoration(
+        color: MohanaColors.outlineVariant,
+        shape: BoxShape.circle,
+      ),
     );
   }
 }

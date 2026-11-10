@@ -128,6 +128,12 @@ class AudioPlayerBar extends StatelessWidget {
                             ],
                           ),
                         ),
+                        // Volver al directo. Solo mientras suena un episodio:
+                        // en el directo no tendría nada que hacer.
+                        if (!audioService.isLive) ...[
+                          const _BackToLiveButton(),
+                          const SizedBox(width: MohanaSpacing.xs),
+                        ],
                         // Play/Pause
                         GestureDetector(
                           onTap: () => audioService.togglePlayPause(),
@@ -167,6 +173,60 @@ class AudioPlayerBar extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// Vuelta al directo desde el mini reproductor.
+///
+/// Cambia lo que suena sin sacar al usuario de donde está: la barra vive en
+/// pantallas que no tienen la navegación inferior (la de un programa, por
+/// ejemplo), y ahí este era el hueco — se entraba a un episodio y no había
+/// forma de volver a la emisora. Para *ver* el reproductor del directo está
+/// el toque sobre la barra, que ya lleva al que corresponda.
+///
+/// Va plano y en lila: el círculo con gradiente es el lenguaje del play, y
+/// dos botones iguales en 38 píxeles se confundirían.
+class _BackToLiveButton extends StatelessWidget {
+  const _BackToLiveButton();
+
+  static const _label = 'Volver al directo';
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: _label,
+      child: Tooltip(
+        message: _label,
+        excludeFromSemantics: true,
+        child: GestureDetector(
+          onTap: () => AudioService().playLive(),
+          // El círculo se ve a 34, pero el área que responde al dedo mide 44
+          // de ancho: por debajo de eso se falla el toque más de lo que se
+          // acierta. El alto se queda en 38, el mismo del play, para que la
+          // barra no dé un salto al pasar del directo a un episodio.
+          child: Container(
+            width: 44,
+            height: 38,
+            color: Colors.transparent,
+            alignment: Alignment.center,
+            child: Container(
+              width: 34,
+              height: 34,
+              decoration: const BoxDecoration(
+                color: MohanaColors.primary100,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.radio_rounded,
+                color: MohanaColors.primary,
+                size: 18,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
