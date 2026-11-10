@@ -1,0 +1,194 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Poppins:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap">
+  <style>
+    body { margin: 0; font-family: Poppins, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #7B2E88; } a:hover { color: #5C1F6A; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="width: 390px; height: 844px; overflow: hidden; display: flex; flex-direction: column; background: linear-gradient(180deg, #D4A3D6 0%, #E7D4EF 45%, #F6EDF9 100%); color: #1A1B21;">
+
+  <!-- AppBar sin tocar: los dos logos son identidad, no ruido -->
+  <div style="height: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;">
+    <img src="./logo_emisora.png" alt="Emisora La Mohana" style="height: 36px; width: auto;">
+    <img src="./logo_ofp.png" alt="Organización Femenina Popular" style="height: 30px; width: auto;">
+  </div>
+
+  <div style="flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
+
+    <div style="height: 12px; flex-shrink: 0;"></div>
+
+    <!-- ① EN EL AIRE — la emisora deja de estar escondida en la barra de abajo -->
+    <div style="margin: 0 20px; flex-shrink: 0; border-radius: 16px; background: linear-gradient(135deg, #7B2E88 0%, #5C1F6A 100%); box-shadow: 0 6px 18px rgba(92, 31, 106, 0.28); padding: 14px 16px; display: flex; align-items: center; gap: 14px;">
+      <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 5px; background: #C2185B; border-radius: 100px; padding: 3px 9px;">
+            <div style="width: 6px; height: 6px; border-radius: 50%; background: #FFFFFF;"></div>
+            <div style="font-size: 9px; font-weight: 700; letter-spacing: 0.8px; color: #FFFFFF;">EN EL AIRE</div>
+          </div>
+          <!-- Ecualizador: señal de que suena, no decoración -->
+          <div style="display: flex; align-items: flex-end; gap: 2px; height: 12px;">
+            <div style="width: 2px; height: 6px; border-radius: 1px; background: #E18F53;"></div>
+            <div style="width: 2px; height: 12px; border-radius: 1px; background: #E18F53;"></div>
+            <div style="width: 2px; height: 8px; border-radius: 1px; background: #E18F53;"></div>
+            <div style="width: 2px; height: 11px; border-radius: 1px; background: #E18F53;"></div>
+          </div>
+        </div>
+        <div style="font-family: 'Bree Serif', Georgia, serif; font-size: 18px; line-height: 1.15; color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Revista Informativa</div>
+        <div style="font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.72);">7:00 – 8:00 a. m. · 91.2 FM</div>
+      </div>
+      <div style="width: 52px; height: 52px; flex-shrink: 0; border-radius: 50%; background: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#7B2E88"><path d="M8 5v14l11-7z"></path></svg>
+      </div>
+    </div>
+
+    <div style="height: 24px; flex-shrink: 0;"></div>
+
+    <div style="padding: 0 20px; font-size: 12px; font-weight: 700; letter-spacing: 1.4px; color: #6A2575;">DESTACADO</div>
+
+    <div style="height: 12px; flex-shrink: 0;"></div>
+
+    <!-- ② Titular: gana fecha y firma, conserva su CTA (es uno solo) -->
+    <div style="margin: 0 20px; height: 280px; flex-shrink: 0; border-radius: 16px; box-shadow: 0 6px 18px rgba(92, 31, 106, 0.16); overflow: hidden; position: relative; background: linear-gradient(135deg, #9D47A4 0%, #5C1F6A 100%);">
+      <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.22;">
+        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round">
+          <path d="M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4"></path>
+          <circle cx="12" cy="12" r="2"></circle>
+        </svg>
+      </div>
+      <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.8) 100%);"></div>
+      <div style="position: absolute; inset: 0; padding: 20px; display: flex; flex-direction: column; justify-content: flex-end;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="background: #2E7D32; border-radius: 8px; padding: 4px 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: #FFFFFF;">CULTURA</div>
+          <div style="font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.8);">20 may · María del Carmen Rojas</div>
+        </div>
+        <div style="height: 8px;"></div>
+        <div style="font-family: 'Bree Serif', Georgia, serif; font-size: 22px; line-height: 1.2; color: #FFFFFF;">Festival de Tambores regresa al río Magdalena</div>
+        <div style="height: 4px;"></div>
+        <div style="font-size: 13px; line-height: 1.4; color: rgba(255,255,255,0.85);">La decimoquinta edición del Festival de Tambores del río Magdalena vuelve a reunir a más de 200…</div>
+        <div style="height: 8px;"></div>
+        <div style="font-size: 13px; font-weight: 700; color: #FFFFFF;">Leer Más  →</div>
+      </div>
+    </div>
+
+    <div style="height: 24px; flex-shrink: 0;"></div>
+
+    <div style="padding: 0 20px; font-size: 12px; font-weight: 700; letter-spacing: 1.4px; color: #6A2575;">LO MÁS RECIENTE</div>
+
+    <div style="height: 12px; flex-shrink: 0;"></div>
+
+    <!-- ③ Card de lista: la fecha entra donde estaba "LEER MÁS" -->
+    <div style="margin: 0 20px; flex-shrink: 0; padding: 12px; background: #FFFFFF; border-radius: 16px; box-shadow: 0 6px 18px rgba(92, 31, 106, 0.16); display: flex; gap: 12px; align-items: flex-start;">
+      <div style="width: 100px; height: 100px; flex-shrink: 0; border-radius: 12px; background: linear-gradient(135deg, #D4A3D6 0%, #E8D0EB 100%); display: flex; align-items: center; justify-content: center;">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#5C1F6A" stroke-width="1.3" stroke-linecap="round" opacity="0.45">
+          <path d="M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4"></path>
+          <circle cx="12" cy="12" r="2"></circle>
+        </svg>
+      </div>
+      <div style="flex-grow: 1; min-width: 0;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #558B2F;">MEDIO AMBIENTE</div>
+          <div style="width: 3px; height: 3px; border-radius: 50%; background: #CDCDD5;"></div>
+          <div style="font-size: 11px; font-weight: 500; color: #49454F;">hace 2 días</div>
+        </div>
+        <div style="height: 6px;"></div>
+        <div style="font-family: 'Bree Serif', Georgia, serif; font-size: 15px; line-height: 1.3; color: #1A1B21;">Comunidades del sur se organizan para proteger la ciénaga</div>
+        <div style="height: 6px;"></div>
+        <div style="font-size: 12px; line-height: 1.4; color: #49454F;">Doce veredas firmaron un acuerdo para vigilar los caños que alimentan la ciénaga de Paredes.</div>
+      </div>
+    </div>
+
+    <div style="height: 16px; flex-shrink: 0;"></div>
+
+    <div style="margin: 0 20px; flex-shrink: 0; padding: 12px; background: #FFFFFF; border-radius: 16px; box-shadow: 0 6px 18px rgba(92, 31, 106, 0.16); display: flex; gap: 12px; align-items: flex-start;">
+      <div style="width: 100px; height: 100px; flex-shrink: 0; border-radius: 12px; background: linear-gradient(135deg, #D4A3D6 0%, #E8D0EB 100%); display: flex; align-items: center; justify-content: center;">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#5C1F6A" stroke-width="1.3" stroke-linecap="round" opacity="0.45">
+          <path d="M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4"></path>
+          <circle cx="12" cy="12" r="2"></circle>
+        </svg>
+      </div>
+      <div style="flex-grow: 1; min-width: 0;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #AD1457;">COMUNIDAD</div>
+          <div style="width: 3px; height: 3px; border-radius: 50%; background: #CDCDD5;"></div>
+          <div style="font-size: 11px; font-weight: 500; color: #49454F;">hace 5 días</div>
+        </div>
+        <div style="height: 6px;"></div>
+        <div style="font-family: 'Bree Serif', Georgia, serif; font-size: 15px; line-height: 1.3; color: #1A1B21;">Mujeres del río abren la primera cooperativa de pesca</div>
+        <div style="height: 6px;"></div>
+        <div style="font-size: 12px; line-height: 1.4; color: #49454F;">Después de dos años de reuniones, cuarenta pescadoras firmaron los estatutos.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Mini reproductor sin cambios estructurales -->
+  <div style="flex-shrink: 0; border-top: 1px solid rgba(205, 205, 213, 0.55); border-radius: 16px 16px 0 0; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(20px); padding: 8px 16px; display: flex; align-items: center; gap: 12px;">
+    <div style="width: 36px; height: 36px; flex-shrink: 0; border-radius: 10px; background: linear-gradient(135deg, #7B2E88 0%, #5C1F6A 100%); display: flex; align-items: center; justify-content: center;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="8" width="20" height="12" rx="2"></rect><path d="m17 3-9 5"></path><circle cx="8" cy="14" r="2.4"></circle></svg>
+    </div>
+    <div style="flex-grow: 1; min-width: 0;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="font-size: 13px; font-weight: 700; color: #1A1B21;">Revista Informativa</div>
+        <div style="display: flex; align-items: center; gap: 4px; background: #7B2E88; border-radius: 8px; padding: 2px 8px;">
+          <div style="width: 6px; height: 6px; border-radius: 50%; background: #FFFFFF;"></div>
+          <div style="font-size: 8px; font-weight: 700; letter-spacing: 0.5px; color: #FFFFFF;">EN VIVO</div>
+        </div>
+      </div>
+      <div style="height: 2px;"></div>
+      <div style="font-size: 11px; font-weight: 500; color: #49454F;">91.2 FM · La emisora de las mujeres</div>
+    </div>
+    <div style="width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; background: linear-gradient(135deg, #7B2E88 0%, #5C1F6A 100%); box-shadow: 0 8px 24px -4px rgba(26,27,33,0.06); display: flex; align-items: center; justify-content: center;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M6 5h4v14H6zM14 5h4v14h-4z"></path></svg>
+    </div>
+  </div>
+
+  <div style="flex-shrink: 0; background: #FFFFFF; border-top: 1px solid rgba(205, 205, 213, 0.4); display: flex; align-items: center; padding: 8px 0;">
+    <div style="flex-grow: 1; display: flex; justify-content: center;">
+      <div style="padding: 6px 16px; border-radius: 100px; background: #E8D0EB; display: flex;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#7B2E88"><path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z"></path></svg>
+      </div>
+    </div>
+    <div style="flex-grow: 1; display: flex; justify-content: center;">
+      <div style="padding: 6px 16px; display: flex;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#49454F" stroke-width="1.8" stroke-linecap="round"><path d="M12 14a2 2 0 0 0 2-2V6a2 2 0 1 0-4 0v6a2 2 0 0 0 2 2Z"></path><path d="M7 11v1a5 5 0 0 0 10 0v-1M12 17v4"></path></svg>
+      </div>
+    </div>
+    <div style="padding: 0 8px; display: flex;">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #7B2E88 0%, #5C1F6A 100%); box-shadow: 0 4px 20px -2px rgba(123,46,136,0.15); position: relative; display: flex; align-items: center; justify-content: center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="8" width="20" height="12" rx="2"></rect><path d="m17 3-9 5"></path><circle cx="8" cy="14" r="2.4"></circle></svg>
+        <div style="position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: #E91E63; border: 1.5px solid #FFFFFF;"></div>
+      </div>
+    </div>
+    <div style="flex-grow: 1; display: flex; justify-content: center;">
+      <div style="padding: 6px 16px; display: flex;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#49454F" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 8h8M8 12h8M8 16h5"></path></svg>
+      </div>
+    </div>
+    <div style="flex-grow: 1; display: flex; justify-content: center;">
+      <div style="padding: 6px 16px; display: flex;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#49454F" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3"></circle><circle cx="17" cy="9" r="2.2"></circle><path d="M3 20a6 6 0 0 1 12 0M15 20a5 5 0 0 1 6-4.6"></path></svg>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

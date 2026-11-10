@@ -1,0 +1,9 @@
+{
+  "name": "mohana-hygraph-tools",
+  "private": true,
+  "type": "module",
+  "description": "Migraciones de esquema de Hygraph para la app de La Mohana",
+  "dependencies": {
+    "@hygraph/management-sdk": "^1.6.1"
+  }
+}

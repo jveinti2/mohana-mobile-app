@@ -86,3 +86,5 @@ linux/flutter/ephemeral/
 **/android/app/google-services.json
 **/ios/Runner/GoogleService-Info.plist
 lib/firebase_options.dart
+# Material pesado que no pertenece al repo
+*.exe

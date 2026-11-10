@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Poppins:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap">
+  <style>
+    body { margin: 0; font-family: Poppins, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #7B2E88; } a:hover { color: #5C1F6A; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="width: 390px; height: 844px; overflow: hidden; display: flex; flex-direction: column; background: linear-gradient(180deg, #D4A3D6 0%, #E7D4EF 45%, #F6EDF9 100%); color: #1A1B21;">
+
+  <div style="height: 56px; flex-shrink: 0; display: flex; align-items: center; padding: 0 16px;">
+    <div style="font-family: 'Bree Serif', Georgia, serif; font-size: 20px; color: #5C1F6A;">Podcasts</div>
+  </div>
+
+  <div style="flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
+
+    <div style="height: 8px; flex-shrink: 0;"></div>
+
+    <!-- ① Buscador: 27 programas con nombres largos no se recorren a ciegas -->
+    <div style="margin: 0 16px; flex-shrink: 0; height: 44px; background: #FFFFFF; border: 1px solid #E2E1E8; border-radius: 12px; display: flex; align-items: center; gap: 10px; padding: 0 14px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#49454F" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <div style="flex-grow: 1; font-size: 14px; color: #49454F;">Buscar programa o episodio</div>
+    </div>
+
+    <div style="height: 20px; flex-shrink: 0;"></div>
+
+    <!-- ② Seguir escuchando: ocupa el sitio del destacado cuando hay algo a medias -->
+    <div style="padding: 0 16px; font-size: 12px; font-weight: 700; letter-spacing: 1.4px; color: #6A2575;">SEGUIR ESCUCHANDO</div>
+
+    <div style="height: 12px; flex-shrink: 0;"></div>
+
+    <div style="margin: 0 16px; flex-shrink: 0; padding: 12px; background: #FFFFFF; border-radius: 16px; box-shadow: 0 6px 18px rgba(92, 31, 106, 0.16); display: flex; gap: 12px; align-items: center;">
+      <div style="width: 56px; height: 56px; flex-shrink: 0; border-radius: 12px; background: linear-gradient(135deg, #D4A3D6 0%, #E8D0EB 100%); display: flex; align-items: center; justify-content: center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5C1F6A" stroke-width="1.4" stroke-linecap="round" opacity="0.45"><circle cx="12" cy="12" r="2"></circle><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4"></path></svg>
+      </div>
+      <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px;">
+        <div style="font-size: 11px; font-weight: 500; color: #49454F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Guardianas Ambientales</div>
+        <div style="font-family: 'Bree Serif', Georgia, serif; font-size: 14px; line-height: 1.25; color: #1A1B21; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">El agua que nos queda</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="flex-grow: 1; height: 3px; border-radius: 2px; background: rgba(205, 205, 213, 0.45); overflow: hidden;">
+            <div style="width: 62%; height: 100%; background: #7B2E88;"></div>
+          </div>
+          <div style="font-size: 10px; font-weight: 500; color: #49454F; white-space: nowrap;">18 min</div>
+        </div>
+      </div>
+      <div style="width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; background: linear-gradient(135deg, #7B2E88 0%, #5C1F6A 100%); display: flex; align-items: center; justify-content: center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M8 5v14l11-7z"></path></svg>
+      </div>
+    </div>
+
+    <div style="height: 24px; flex-shrink: 0;"></div>
+
+    <div style="padding: 0 16px; font-size: 12px; font-weight: 700; letter-spacing: 1.4px; color: #6A2575;">EPISODIOS RECIENTES</div>
+
+    <div style="height: 12px; flex-shrink: 0;"></div>
+
+    <!-- ③ Carrusel existente, con la fecha que hoy no se ve -->
+    <div style="height: 178px; flex-shrink: 0; padding: 0 16px; display: flex; gap: 12px; overflow: hidden;">
+      <div style="width: 130px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;">
+        <div style="width: 130px; height: 130px; border-radius: 12px; background: linear-gradient(135deg, #D4A3D6 0%, #E8D0EB 100%); box-shadow: 0 6px 18px rgba(92, 31, 106, 0.16); display: flex; align-items: center; justify-content: center;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#5C1F6A" stroke-width="1.3" stroke-linecap="round" opacity="0.45"><circle cx="12" cy="12" r="2"></circle><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"></path></svg>
+        </div>
+        <div style="font-size: 12px; font-weight: 700; line-height: 1.25; color: #1A1B21; overflow: hidden;">Las cantadoras del Magdalena</div>
+        <div style="font-size: 10px; font-weight: 500; color: #49454F;">21 may · 48 min</div>
+      </div>
+      <div style="width: 130px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;">
+        <div style="width: 130px; height: 130px; border-radius: 12px; background: linear-gradient(135deg, #D4A3D6 0%, #E8D0EB 100%); box-shadow: 0 6px 18px rgba(92, 31, 106, 0.16); display: flex; align-items: center; justify-content: center;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#5C1F6A" stroke-width="1.3" stroke-linecap="round" opacity="0.45"><circle cx="12" cy="12" r="2"></circle><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"></path></svg>
+        </div>
+        <div style="font-size: 12px; font-weight: 700; line-height: 1.25; color: #1A1B21; overflow: hidden;">Comuna Popular: el barrio decide</div>
+        <div style="font-size: 10px; font-weight: 500; color: #49454F;">20 may · 1 h 5 min</div>
+      </div>
+      <div style="width: 130px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;">
+        <div style="width: 130px; height: 130px; border-radius: 12px; background: linear-gradient(135deg, #D4A3D6 0%, #E8D0EB 100%); box-shadow: 0 6px 18px rgba(92, 31, 106, 0.16); display: flex; align-items: center; justify-content: center;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#5C1F6A" stroke-width="1.3" stroke-linecap="round" opacity="0.45"><circle cx="12" cy="12" r="2"></circle><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"></path></svg>
+        </div>
+        <div style="font-size: 12px; font-weight: 700; line-height: 1.25; color: #1A1B21; overflow: hidden;">Letras Púrpura</div>
+        <div style="font-size: 10px; font-weight: 500; color: #49454F;">19 may · 32 min</div>
+      </div>
+    </div>
+
+    <div style="height: 24px; flex-shrink: 0;"></div>
+
+    <div style="padding: 0 16px; display: flex; align-items: baseline; gap: 8px;">
+      <div style="font-size: 12px; font-weight: 700; letter-spacing: 1.4px; color: #6A2575;">TODOS LOS PROGRAMAS</div>
+      <div style="font-size: 11px; font-weight: 500; color: #49454F;">27</div>
+    </div>
+
+    <div style="height: 12px; flex-shrink: 0;"></div>
+
+    <!-- ④ Cuadrícula existente: la carátula ya manda aquí, se conserva -->
+    <div style="padding: 0 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+      <div style="padding: 8px; background: #FFFFFF; border-radius: 16px; box-shadow: 0 6px 18px rgba(92, 31, 106, 0.16); display: flex; flex-direction: column; gap: 8px;">
+        <div style="width: 100%; aspect-ratio: 1; border-radius: 12px; background: linear-gradient(135deg, #D4A3D6 0%, #E8D0EB 100%); display: flex; align-items: center; justify-content: center;">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#5C1F6A" stroke-width="1.3" stroke-linecap="round" opacity="0.45"><circle cx="12" cy="12" r="2"></circle><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"></path></svg>
+        </div>
+        <div style="font-size: 13px; font-weight: 700; line-height: 1.25; color: #1A1B21;">Revista Informativa La Mohana</div>
+        <div style="font-size: 11px; color: #49454F;">661 episodios</div>
+      </div>
+      <div style="padding: 8px; background: #FFFFFF; border-radius: 16px; box-shadow: 0 6px 18px rgba(92, 31, 106, 0.16); display: flex; flex-direction: column; gap: 8px;">
+        <div style="width: 100%; aspect-ratio: 1; border-radius: 12px; background: linear-gradient(135deg, #D4A3D6 0%, #E8D0EB 100%); display: flex; align-items: center; justify-content: center;">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#5C1F6A" stroke-width="1.3" stroke-linecap="round" opacity="0.45"><circle cx="12" cy="12" r="2"></circle><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"></path></svg>
+        </div>
+        <div style="font-size: 13px; font-weight: 700; line-height: 1.25; color: #1A1B21;">Comuna Popular</div>
+        <div style="font-size: 11px; color: #49454F;">214 episodios</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="flex-shrink: 0; border-top: 1px solid rgba(205, 205, 213, 0.55); border-radius: 16px 16px 0 0; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(20px); padding: 8px 16px; display: flex; flex-direction: column; gap: 6px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="width: 36px; height: 36px; flex-shrink: 0; border-radius: 10px; background: linear-gradient(135deg, #D4A3D6 0%, #E8D0EB 100%); display: flex; align-items: center; justify-content: center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C1F6A" stroke-width="1.5" stroke-linecap="round" opacity="0.5"><circle cx="12" cy="12" r="2"></circle><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4"></path></svg>
+      </div>
+      <div style="flex-grow: 1; min-width: 0;">
+        <div style="font-size: 13px; font-weight: 700; color: #1A1B21; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">El agua que nos queda</div>
+        <div style="height: 2px;"></div>
+        <div style="font-size: 11px; font-weight: 500; color: #49454F;">Guardianas Ambientales</div>
+      </div>
+      <div style="width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%; background: #E8D0EB; display: flex; align-items: center; justify-content: center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7B2E88" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="8" width="20" height="12" rx="2"></rect><path d="m17 3-9 5"></path><circle cx="8" cy="14" r="2.4"></circle></svg>
+      </div>
+      <div style="width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; background: linear-gradient(135deg, #7B2E88 0%, #5C1F6A 100%); display: flex; align-items: center; justify-content: center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M6 5h4v14H6zM14 5h4v14h-4z"></path></svg>
+      </div>
+    </div>
+    <div style="height: 3px; border-radius: 2px; background: rgba(205, 205, 213, 0.45); overflow: hidden;">
+      <div style="width: 62%; height: 100%; background: #7B2E88;"></div>
+    </div>
+  </div>
+
+  <div style="flex-shrink: 0; background: #FFFFFF; border-top: 1px solid rgba(205, 205, 213, 0.4); display: flex; align-items: center; padding: 8px 0;">
+    <div style="flex-grow: 1; display: flex; justify-content: center;">
+      <div style="padding: 6px 16px; display: flex;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#49454F" stroke-width="1.8" stroke-linecap="round"><path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z"></path></svg>
+      </div>
+    </div>
+    <div style="flex-grow: 1; display: flex; justify-content: center;">
+      <div style="padding: 6px 16px; border-radius: 100px; background: #E8D0EB; display: flex;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7B2E88" stroke-width="2" stroke-linecap="round"><path d="M12 14a2 2 0 0 0 2-2V6a2 2 0 1 0-4 0v6a2 2 0 0 0 2 2Z"></path><path d="M7 11v1a5 5 0 0 0 10 0v-1M12 17v4"></path></svg>
+      </div>
+    </div>
+    <div style="padding: 0 8px; display: flex;">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #7B2E88 0%, #5C1F6A 100%); box-shadow: 0 4px 20px -2px rgba(123,46,136,0.15); display: flex; align-items: center; justify-content: center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="8" width="20" height="12" rx="2"></rect><path d="m17 3-9 5"></path><circle cx="8" cy="14" r="2.4"></circle></svg>
+      </div>
+    </div>
+    <div style="flex-grow: 1; display: flex; justify-content: center;">
+      <div style="padding: 6px 16px; display: flex;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#49454F" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 8h8M8 12h8M8 16h5"></path></svg>
+      </div>
+    </div>
+    <div style="flex-grow: 1; display: flex; justify-content: center;">
+      <div style="padding: 6px 16px; display: flex;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#49454F" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3"></circle><circle cx="17" cy="9" r="2.2"></circle><path d="M3 20a6 6 0 0 1 12 0M15 20a5 5 0 0 1 6-4.6"></path></svg>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{
+  "artboards": [
+    { "file": "Actual.dc.html", "title": "Home · hoy", "x": 0, "y": 0, "w": 390, "h": 844 },
+    { "file": "Main.dc.html", "title": "Home · propuesta", "x": 450, "y": 0, "w": 390, "h": 844 },
+    { "file": "Podcasts.dc.html", "title": "Biblioteca · propuesta", "x": 900, "y": 0, "w": 390, "h": 844 },
+    { "file": "Directo.dc.html", "title": "Directo · propuesta", "x": 1350, "y": 0, "w": 390, "h": 844 },
+    { "file": "Sistema.dc.html", "title": "Antes y después", "x": 0, "y": 1120, "w": 940, "h": 780 }
+  ],
+  "annotations": [
+    {
+      "id": "diagnostico",
+      "x": 0,
+      "y": -230,
+      "w": 390,
+      "text": "HOY\n\nEs una emisora, pero el feed abre con artículos de Drive y el directo solo existe en la barra de abajo.\n\nLa carátula de cada programa —lo único que hace reconocible un podcast— se ve a 36 px dentro de una caja blanca.\n\nY ninguna noticia dice cuándo se publicó, aunque el modelo ya guarda la fecha."
+    },
+    {
+      "id": "propuesta-home",
+      "x": 450,
+      "y": -230,
+      "w": 390,
+      "text": "PROPUESTA · HOME\n\n1. «En el aire» sube al primer bloque del feed, en el morado de marca, con el programa que suena y un play de 52 px.\n\n2. Las cards ganan la fecha y pierden el «LEER MÁS» que se repetía en cada fila sin decir nada: la card entera ya es tocable.\n\nLogos, tipografías, sombras y gradiente tonal, intactos."
+    },
+    {
+      "id": "propuesta-biblioteca",
+      "x": 900,
+      "y": -230,
+      "w": 390,
+      "text": "PROPUESTA · BIBLIOTECA\n\nBuscador arriba: 27 programas con nombres de hasta 50 caracteres no se recorren a ciegas en una rejilla paginada de 12 en 12.\n\n«Seguir escuchando» ocupa el sitio del destacado cuando hay un episodio a medias, y cae al destacado cuando no lo hay."
+    },
+    {
+      "id": "propuesta-directo",
+      "x": 1350,
+      "y": -230,
+      "w": 390,
+      "text": "PROPUESTA · DIRECTO\n\nEl propio código lo admite: «al ser transmisión en vivo no conocemos el programa al aire, así que mostramos la marca».\n\nCon una carpeta parrilla/ en Drive —mismo patrón de CMS que ya usan titular/ y articulos/— la pantalla puede responder qué suena y qué viene a las 8:00.\n\nEl círculo de 91.2 se queda: es la identidad."
+    },
+    {
+      "id": "coste",
+      "x": 0,
+      "y": 950,
+      "w": 620,
+      "text": "QUÉ CUESTA CADA COSA\n\nBarato — fecha en la card, quitar «LEER MÁS», carátula grande: son widgets que ya existen (ArticleListCard, IvooxSection). Una tarde.\n\nCódigo nuevo — buscador (filtrar la lista del catálogo, ya está en memoria), «Seguir escuchando» (hoy no se guarda la posición; shared_preferences ya es dependencia).\n\nDato nuevo — la parrilla del directo. Sin ella, «En el aire» funciona igual mostrando «Emisora La Mohana · 91.2 FM»."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}
