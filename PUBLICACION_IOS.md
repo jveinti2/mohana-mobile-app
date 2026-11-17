@@ -13,9 +13,22 @@ y se firma en la nube. Hay un iPhone disponible para probar y tomar capturas.
 **Se compra la cuenta individual ahora y se migra a la OFP después.** Decisión del
 cliente: salir cuanto antes pesa más que ahorrarse la cuota.
 
-- [ ] Inscribirse desde la app Apple Developer en el iPhone → *Individual / Sole
-      Proprietor* → verificar identidad con cédula (el nombre debe coincidir
-      **exacto** con el documento; es el fallo más común) → pagar 459.900 COP.
+- [x] Inscripción enviada y **pagada** el 17/11/2026 desde la app Apple Developer
+      (*Individual / Sole Proprietor*). Estado: **Enrollment Pending**, a la espera
+      de que Apple la apruebe (24-48 h habitualmente).
+
+### El pago falló dos veces: qué pasaba
+
+Ni la tarjeta virtual de DolarApp ni la física de Nu pasaban, las dos salían en
+`(Error)` en Ajustes → Pago y envío. La causa no era ninguna de las dos: había un
+**saldo pendiente en la cuenta de Apple** de una suscripción que no se pudo cobrar.
+Con un saldo pendiente, Apple rechaza cualquier método de pago nuevo que añadas, y
+el mensaje que muestra habla del método de pago, no de la deuda.
+
+Se resuelve en Ajustes → tu nombre → Contenido y compras → Ver cuenta → Historial
+de compras, pagando el pedido que aparece en rojo. Dicho sea de paso: Apple no
+acepta tarjetas prepago ni virtuales para esta inscripción, así que la de DolarApp
+no habría servido igualmente.
 
 ### Lo que esto implica
 
@@ -148,19 +161,30 @@ un rechazo casi seguro.
 
 ---
 
-## 6. Codemagic — requiere la API key
+## 6. Codemagic — `codemagic.yaml` escrito, falta la API key
 
-Plan gratuito: ~500 minutos de macOS al mes, 1 build en paralelo. Un build de esta
-app ronda 10–15 min, así que sobra. Descartado Xcode Cloud: se configura desde
-Xcode, o sea desde un Mac.
+El workflow está en `codemagic.yaml`, en la raíz del repositorio: instala
+dependencias, corre `flutter analyze` y los tests (si fallan, no se gastan minutos
+de macOS compilando), saca el número de build de lo que ya hay en TestFlight para
+que nunca se repita, resuelve los pods, compila el IPA firmado y lo sube a
+TestFlight.
 
-- [ ] Conectar el repositorio y cargar la API key.
-- [ ] Activar firma automática de iOS: Codemagic genera certificado y perfil por
-      API, sin que intervenga ningún Mac.
-- [ ] Configurar el workflow: `flutter build ipa --release` y publicación a TestFlight.
-- [ ] Primer build. Aquí salen los errores de compilación iOS que no se ven desde Linux.
+Plan gratuito: ~500 minutos de macOS al mes y un build en paralelo. Un build de
+esta app ronda 10-15 min. Descartado Xcode Cloud: se configura desde Xcode, o sea
+desde un Mac.
 
----
+Falta hacer en la interfaz de Codemagic, que no se puede dejar escrito en el YAML:
+
+- [ ] Cargar la API key de App Store Connect en Teams → Integrations con el nombre
+      `mohana-app-store-connect`.
+- [ ] Rellenar `APP_STORE_APPLE_ID` con el Apple ID numérico de la app, que sale
+      de la URL de App Store Connect una vez creada.
+- [ ] Conectar el repositorio y lanzar el primer build.
+
+El paso de CocoaPods es el que más probabilidades tiene de fallar en el estreno:
+esta app nunca se ha compilado para iOS, no hay `Podfile.lock` versionado y los
+pods de `just_audio_background` se resuelven ahí por primera vez. Los logs de
+Xcode se guardan como artefacto justo para eso.
 
 ## 7. Pruebas en iPhone por TestFlight — el paso que más importa
 
