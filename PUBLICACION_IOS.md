@@ -153,11 +153,19 @@ un rechazo casi seguro.
 - [x] Sin enlaces a web ni redes: la OFP no considera necesario comunicarlas aquí,
       y `ofp.org.co` no respondía al comprobarlo.
 
-## 5. App Store Connect — requiere la cuenta activa
+## 5. App Store Connect — HECHO (18/11/2026)
 
-- [ ] Crear la app con el bundle id `com.ofp.lamohanaradio`.
-- [ ] Generar una **API key** en Users and Access → Integrations, rol App Manager.
-      Es la pieza que permite firmar y publicar sin Mac.
+Cuenta de desarrollador aprobada el 18/11/2026. **Team ID: 5WGZBLZBDM.**
+
+- [x] App ID registrado en el portal con bundle id explícito `com.ofp.lamohanaradio`,
+      sin capacidades: la app no usa push ni iCloud, y el audio en segundo plano se
+      declara en el `Info.plist`, no en el App ID. El campo *Description* del App ID
+      no admite caracteres especiales, así que el punto de «91.2» hay que quitarlo.
+- [x] App creada en App Store Connect. **Apple ID: 6836393064.**
+- [ ] Generar la **API key** en Users and Access → Integrations → Team Keys, rol
+      App Manager. Es la pieza que permite firmar y publicar sin Mac. El archivo
+      `.p8` **solo se descarga una vez**; hay que guardarlo junto al Key ID y al
+      Issuer ID.
 
 ---
 
@@ -177,8 +185,7 @@ Falta hacer en la interfaz de Codemagic, que no se puede dejar escrito en el YAM
 
 - [ ] Cargar la API key de App Store Connect en Teams → Integrations con el nombre
       `mohana-app-store-connect`.
-- [ ] Rellenar `APP_STORE_APPLE_ID` con el Apple ID numérico de la app, que sale
-      de la URL de App Store Connect una vez creada.
+- [x] `APP_STORE_APPLE_ID` ya puesto: 6836393064.
 - [ ] Conectar el repositorio y lanzar el primer build.
 
 El paso de CocoaPods es el que más probabilidades tiene de fallar en el estreno:

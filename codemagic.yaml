@@ -12,10 +12,11 @@
 #      rol App Manager) y cargarla en Codemagic → Teams → Integrations →
 #      App Store Connect, con el nombre `mohana-app-store-connect`. Si le pones
 #      otro nombre, cámbialo abajo en `integrations`.
-#   2. Crear la app en App Store Connect con el bundle id `com.ofp.lamohanaradio`
-#      y copiar su Apple ID numérico (el de la URL de App Store Connect) en
-#      `APP_STORE_APPLE_ID`.
-#   3. Poner el correo de avisos en `publishing.email.recipients`.
+#   2. Conectar este repositorio en Codemagic y lanzar el primer build.
+#
+# Ya hechos: la app existe en App Store Connect con el bundle id
+# `com.ofp.lamohanaradio` (Apple ID 6836393064) y el App ID está registrado en el
+# portal de desarrollador. Team ID: 5WGZBLZBDM.
 #
 # El plan gratuito da unos 500 minutos de macOS al mes y un build en paralelo.
 # Un build de esta app ronda 10-15 min, así que sobra de largo.
@@ -43,8 +44,8 @@ workflows:
         bundle_identifier: com.ofp.lamohanaradio
       vars:
         BUNDLE_ID: com.ofp.lamohanaradio
-        # PENDIENTE: el Apple ID numérico de la app en App Store Connect.
-        APP_STORE_APPLE_ID: 0000000000
+        # Apple ID numérico de la app en App Store Connect.
+        APP_STORE_APPLE_ID: 6836393064
 
     cache:
       cache_paths:
