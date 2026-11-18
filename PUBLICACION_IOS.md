@@ -225,6 +225,14 @@ Este último va **después** de `pod install`, porque CocoaPods regenera
 
 CocoaPods, que era lo que más preocupaba, pasó sin problemas a la primera.
 
+4. **«Complete test information is required... for external testing».** El build
+   2 se procesó bien, pero Codemagic intentó enviarlo a la revisión de TestFlight
+   *externa*, que pide correo de contacto y datos del responsable. No hace falta:
+   las **pruebas internas** no pasan por revisión y el build queda disponible en
+   cuanto Apple lo procesa. El workflow pasó a `submit_to_testflight: false`.
+   Si algún día se quiere repartir a gente de fuera del equipo, se rellena la
+   información en App Store Connect → TestFlight → Test Information.
+
 ### Aviso sin urgencia
 
 **ITMS-90725:** el build se hizo con el SDK de iOS 26.5. Desde abril de 2027, App
