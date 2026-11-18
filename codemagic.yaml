@@ -76,9 +76,13 @@ workflows:
         # El número sale de lo que ya hay en TestFlight, no de pubspec.yaml: así
         # nunca se repite, que es lo único que Apple exige. El nombre de versión
         # (1.3.0) sí sale de pubspec.
+        #
+        # La variable no puede llamarse FLUTTER_BUILD_NUMBER: ese nombre lo
+        # reserva el framework y `flutter build` aborta si lo encuentra en el
+        # entorno. Se pasa por la línea de comandos con --build-number.
         script: |
           BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || echo 0)
-          echo "FLUTTER_BUILD_NUMBER=$((BUILD_NUMBER + 1))" >> $CM_ENV
+          echo "NUMERO_BUILD=$((BUILD_NUMBER + 1))" >> $CM_ENV
 
       - name: Certificado y perfil de firma
         # El bloque `ios_signing` de Codemagic solo *busca* certificados y
@@ -119,7 +123,7 @@ workflows:
       - name: Compilar IPA
         script: |
           flutter build ipa --release \
-            --build-number=$FLUTTER_BUILD_NUMBER \
+            --build-number=$NUMERO_BUILD \
             --export-options-plist=/Users/builder/export_options.plist
 
     artifacts:
