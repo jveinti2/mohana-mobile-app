@@ -14,7 +14,10 @@
 #      cargarla en Codemagic → Settings → Integrations → App Store Connect con
 #      el nombre `mohana-app-store-connect`. Si le pones otro nombre, cámbialo
 #      abajo en `integrations`.
-#   2. Conectar este repositorio en Codemagic y lanzar el primer build.
+#   2. Crear el grupo de variables `firma_ios` en App settings → Environment
+#      variables, con `CERTIFICATE_PRIVATE_KEY` (una clave RSA en PEM) marcada
+#      como *Secure*. Es la clave privada del certificado de distribución.
+#   3. Conectar este repositorio en Codemagic y lanzar el primer build.
 #
 # Ya hechos: la app existe en App Store Connect con el bundle id
 # `com.ofp.lamohanaradio` (Apple ID 6836393064) y el App ID está registrado en el
@@ -38,6 +41,11 @@ workflows:
       flutter: 3.47.1
       xcode: latest
       cocoapods: default
+      groups:
+        # Grupo de variables definido en Codemagic (App settings → Environment
+        # variables). Contiene CERTIFICATE_PRIVATE_KEY, la clave RSA con la que
+        # se emite el certificado de distribución. Protegida: no sale en los logs.
+        - firma_ios
       vars:
         BUNDLE_ID: com.ofp.lamohanaradio
         # Apple ID numérico de la app en App Store Connect.
@@ -80,10 +88,18 @@ workflows:
         # de distribución y el perfil de App Store si faltan, y los reutiliza si
         # ya existen. La API key tiene que tener rol **Admin**: con App Manager,
         # Apple no da acceso a Certificates, Identifiers & Profiles por la API.
+        #
+        # `--certificate-key` no es opcional: sin una clave privada propia, el
+        # certificado se crea en Apple pero no se puede guardar en el llavero
+        # («Cannot save Signing Certificates without certificate private key»).
+        # La clave se guarda una sola vez como variable protegida en Codemagic y
+        # se reutiliza en cada build; si se generara una nueva cada vez, Apple
+        # acumularía certificados y solo permite tres.
         script: |
           keychain initialize
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
+            --certificate-key=@env:CERTIFICATE_PRIVATE_KEY \
             --create
           keychain add-certificates
 
