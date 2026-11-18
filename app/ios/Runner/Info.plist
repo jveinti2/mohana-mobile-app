@@ -30,6 +30,12 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- La app no graba audio ni pide acceso al micrófono. Apple exige esta
+	     cadena igualmente (ITMS-90683) porque just_audio y audio_session
+	     referencian APIs de AVAudioSession que pueden acceder a la entrada
+	     de audio. Sin ella, el binario se rechaza al procesarse. -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>La Mohana no graba ni escucha nada. Este aviso lo exige el sistema por la librería de reproducción de audio.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -204,12 +204,31 @@ de App Store si faltan, y `xcode-project use-profiles`, que los aplica al proyec
 Este último va **después** de `pod install`, porque CocoaPods regenera
 `Pods.xcodeproj` y borraría los ajustes de firma si se hiciera antes.
 
-### Lo siguiente que puede fallar
+### Los demás fallos del estreno, por orden
 
-El paso de CocoaPods es el que más probabilidades tiene de fallar en el estreno:
-esta app nunca se ha compilado para iOS, no hay `Podfile.lock` versionado y los
-pods de `just_audio_background` se resuelven ahí por primera vez. Los logs de
-Xcode se guardan como artefacto justo para eso.
+1. **«Cannot save Signing Certificates without certificate private key».**
+   `fetch-signing-files --create` daba de alta el certificado en Apple pero no
+   podía guardarlo sin una clave privada. Se generó una clave RSA y se guardó como
+   variable protegida `CERTIFICATE_PRIVATE_KEY` en el grupo `firma_ios` de
+   Codemagic. Tiene que ser siempre la misma: una nueva en cada build iría
+   acumulando certificados y Apple solo permite tres.
+2. **«FLUTTER_BUILD_NUMBER is used by the framework and cannot be set».** Ese
+   nombre lo reserva Flutter y `flutter build` aborta si lo encuentra en el
+   entorno. La variable pasó a llamarse `NUMERO_BUILD` y se entrega por
+   `--build-number`.
+3. **ITMS-90683, build 1 rechazado al procesarse.** La app compiló y subió bien,
+   pero Apple la rechazó por falta de `NSMicrophoneUsageDescription` en el
+   `Info.plist`. La app no graba nada; la cadena se exige igualmente porque
+   `just_audio` y `audio_session` referencian APIs de `AVAudioSession` que pueden
+   acceder a la entrada de audio. Aviso importante: este rechazo **no aparece en
+   el log de Codemagic**, llega por correo a la cuenta del desarrollador.
+
+CocoaPods, que era lo que más preocupaba, pasó sin problemas a la primera.
+
+### Aviso sin urgencia
+
+**ITMS-90725:** el build se hizo con el SDK de iOS 26.5. Desde abril de 2027, App
+Store Connect exigirá el SDK de iOS 27 o posterior. No bloquea nada hoy.
 
 ## 7. Pruebas en iPhone por TestFlight — el paso que más importa
 
