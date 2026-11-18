@@ -183,10 +183,28 @@ desde un Mac.
 
 Falta hacer en la interfaz de Codemagic, que no se puede dejar escrito en el YAML:
 
-- [ ] Cargar la API key de App Store Connect en Teams → Integrations con el nombre
-      `mohana-app-store-connect`.
+- [x] API key cargada en Codemagic como `mohana-app-store-connect`.
+- [ ] **Regenerarla con rol Admin.** La primera se creó con App Manager y el build
+      falló con «No matching profiles found for bundle identifier». Apple no da
+      acceso a Certificates, Identifiers & Profiles por la API salvo con Admin, así
+      que la firma no puede crear el certificado ni el perfil.
 - [x] `APP_STORE_APPLE_ID` ya puesto: 6836393064.
 - [ ] Conectar el repositorio y lanzar el primer build.
+
+### Por qué falló el primer build
+
+`No matching profiles found for bundle identifier "com.ofp.lamohanaradio" and
+distribution type "app_store"`. El bloque `ios_signing` de Codemagic solo **busca**
+certificados y perfiles ya subidos; no los crea. En una cuenta recién hecha no hay
+ninguno, así que no encontraba nada que usar.
+
+La solución son dos pasos explícitos en el workflow: `app-store-connect
+fetch-signing-files --create`, que genera el certificado de distribución y el perfil
+de App Store si faltan, y `xcode-project use-profiles`, que los aplica al proyecto.
+Este último va **después** de `pod install`, porque CocoaPods regenera
+`Pods.xcodeproj` y borraría los ajustes de firma si se hiciera antes.
+
+### Lo siguiente que puede fallar
 
 El paso de CocoaPods es el que más probabilidades tiene de fallar en el estreno:
 esta app nunca se ha compilado para iOS, no hay `Podfile.lock` versionado y los

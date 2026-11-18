@@ -8,10 +8,12 @@
 # ANTES DEL PRIMER BUILD hay que hacer tres cosas en la interfaz de Codemagic,
 # que no se pueden dejar escritas aquí:
 #
-#   1. Crear una API key en App Store Connect (Users and Access → Integrations,
-#      rol App Manager) y cargarla en Codemagic → Teams → Integrations →
-#      App Store Connect, con el nombre `mohana-app-store-connect`. Si le pones
-#      otro nombre, cámbialo abajo en `integrations`.
+#   1. Crear una API key en App Store Connect (Users and Access → Integrations →
+#      Team Keys) con rol **Admin** —no App Manager: ese rol no puede tocar
+#      Certificates, Identifiers & Profiles por la API y la firma falla— y
+#      cargarla en Codemagic → Settings → Integrations → App Store Connect con
+#      el nombre `mohana-app-store-connect`. Si le pones otro nombre, cámbialo
+#      abajo en `integrations`.
 #   2. Conectar este repositorio en Codemagic y lanzar el primer build.
 #
 # Ya hechos: la app existe en App Store Connect con el bundle id
@@ -36,12 +38,6 @@ workflows:
       flutter: 3.47.1
       xcode: latest
       cocoapods: default
-      ios_signing:
-        # Firma automática: Codemagic crea el certificado de distribución y el
-        # perfil a partir de la API key, y deja el export_options.plist en
-        # /Users/builder/export_options.plist, que es el que usa el build.
-        distribution_type: app_store
-        bundle_identifier: com.ofp.lamohanaradio
       vars:
         BUNDLE_ID: com.ofp.lamohanaradio
         # Apple ID numérico de la app en App Store Connect.
@@ -76,12 +72,33 @@ workflows:
           BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || echo 0)
           echo "FLUTTER_BUILD_NUMBER=$((BUILD_NUMBER + 1))" >> $CM_ENV
 
+      - name: Certificado y perfil de firma
+        # El bloque `ios_signing` de Codemagic solo *busca* certificados y
+        # perfiles ya subidos; en una cuenta recién creada no hay ninguno y el
+        # build muere con «No matching profiles found». Estos cuatro comandos
+        # son la vía documentada para crearlos: `--create` genera el certificado
+        # de distribución y el perfil de App Store si faltan, y los reutiliza si
+        # ya existen. La API key tiene que tener rol **Admin**: con App Manager,
+        # Apple no da acceso a Certificates, Identifiers & Profiles por la API.
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+          keychain add-certificates
+
       - name: CocoaPods
         # Esta app nunca se ha compilado para iOS: no hay Podfile.lock en el
         # repositorio y los pods de just_audio_background se resuelven aquí por
         # primera vez. Es el paso con más probabilidad de fallar en el estreno.
         script: |
           find . -name "Podfile" -execdir pod install \;
+
+      - name: Aplicar los perfiles al proyecto
+        # Va después de `pod install` a propósito: CocoaPods regenera
+        # Pods.xcodeproj y borraría los ajustes de firma si se hiciera antes.
+        # Deja además el export_options.plist que consume el build.
+        script: xcode-project use-profiles
 
       - name: Compilar IPA
         script: |
