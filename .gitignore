@@ -88,3 +88,7 @@ linux/flutter/ephemeral/
 lib/firebase_options.dart
 # Material pesado que no pertenece al repo
 *.exe
+
+# Claves de API de Apple
+*.p8
+AuthKey_*
