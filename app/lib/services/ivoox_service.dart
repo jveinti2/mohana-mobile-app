@@ -490,9 +490,19 @@ class IvooxService {
 
   // ─── Helpers de parseo ─────────────────────────────────────────
 
+  /// Texto de un hijo directo, con las entidades HTML ya deshechas.
+  ///
+  /// El desescapado va aqui y no en quien llama porque iVoox mete los titulos
+  /// y las descripciones dentro de `<![CDATA[...]]>`, y dentro de CDATA el
+  /// analizador XML no toca las entidades: `Notas &amp; Letras` llegaba tal
+  /// cual y se pintaba «NOTAS &AMP; LETRAS» en la pantalla del programa.
+  ///
+  /// Deshacer antes de [_stripHtml] tambien es deliberado: asi el marcado
+  /// doblemente escapado (`&lt;p&gt;`) vuelve a ser una etiqueta y se limpia
+  /// en vez de quedarse a la vista.
   static String? _childText(XmlElement parent, String name) {
     final el = parent.findElements(name).firstOrNull;
-    final text = el?.innerText.trim();
+    final text = el == null ? null : _unescapeHtml(el.innerText).trim();
     return (text == null || text.isEmpty) ? null : text;
   }
 

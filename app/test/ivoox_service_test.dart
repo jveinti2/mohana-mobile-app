@@ -129,4 +129,34 @@ void main() {
     },
     timeout: const Timeout(Duration(seconds: 90)),
   );
+
+  test(
+    'el feed deshace las entidades HTML encerradas en CDATA',
+    () async {
+      // «Notas & Letras» es el caso real: iVoox manda
+      // `<title><![CDATA[Notas &amp; Letras]]></title>`, y dentro de CDATA el
+      // analizador XML no toca la entidad. Se pintaba «NOTAS &AMP; LETRAS» en
+      // la pantalla del programa y en el reproductor.
+      final program = await IvooxService.fetchProgram(
+        const IvooxProgramRef('Notas & Letras', '13235212'),
+        forceRefresh: true,
+      );
+
+      expect(program, isNotNull);
+      expect(program!.title, 'Notas & Letras');
+
+      for (final texto in [
+        program.title,
+        program.description,
+        ...program.episodeList.expand((e) => [e.title, e.description]),
+      ]) {
+        expect(
+          texto,
+          isNot(matches(_entidadHtml)),
+          reason: 'entidad HTML sin resolver en «$texto»',
+        );
+      }
+    },
+    timeout: const Timeout(Duration(seconds: 90)),
+  );
 }
