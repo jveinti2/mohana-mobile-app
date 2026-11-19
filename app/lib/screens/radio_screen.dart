@@ -34,7 +34,20 @@ class RadioScreen extends StatelessWidget {
           ),
         ],
       ),
+      // El degradado tiene que pedir el tamano a mano. Scaffold entrega el
+      // cuerpo con restricciones *sueltas*, y dentro va un
+      // SingleChildScrollView vertical que deja pasar el ancho suelto: la
+      // Column se quedaba con el ancho de su hijo mas ancho (el nombre de la
+      // emisora) y el Container, que se ajusta a su hijo, pintaba el degradado
+      // solo en esa franja. El resto de la pantalla se veia del color de fondo
+      // del Scaffold.
+      //
+      // Las demas pantallas no lo sufren porque envuelven al Scaffold entero
+      // —ahi las restricciones vienen apretadas de la ruta—, pero aqui la
+      // barra superior es la del tema y el degradado va dentro.
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(gradient: MohanaGradients.radioPlayer),
         child: ListenableBuilder(
           listenable: AudioService(),

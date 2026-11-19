@@ -276,4 +276,38 @@ void main() {
       onRetry: () {},
     ),
   );
+
+  // Un fondo que no llega al borde no desborda nada, así que el resto de este
+  // archivo no lo veía: en el iPhone el degradado del directo se pintaba solo
+  // en la franja central —el ancho del nombre de la emisora— y a los lados
+  // quedaba el gris del Scaffold. Scaffold entrega el cuerpo con restricciones
+  // sueltas y el scroll vertical las deja pasar, así que el Container se
+  // ajustaba a su hijo en vez de llenar.
+  for (final entrada in pantallas.entries) {
+    testWidgets('el degradado del directo llena el ancho — ${entrada.key}', (
+      tester,
+    ) async {
+      await montar(
+        tester,
+        const RadioScreen(),
+        pantalla: entrada.value,
+        escala: 1.0,
+        enScaffold: false,
+      );
+
+      final fondo = find.byWidgetPredicate(
+        (w) =>
+            w is Container &&
+            w.decoration is BoxDecoration &&
+            (w.decoration as BoxDecoration).gradient ==
+                MohanaGradients.radioPlayer,
+      );
+      expect(fondo, findsOneWidget);
+      expect(
+        tester.getSize(fondo).width,
+        entrada.value.width,
+        reason: 'el degradado no cubre todo el ancho en ${entrada.key}',
+      );
+    });
+  }
 }
